@@ -2,7 +2,7 @@ package com.rydeenworks.mybooksearch;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -11,6 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,11 +39,20 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
     private String lastBookWebUrl;
 
+    private AdView mAdView;
+
     private final HistoryPage historyPage = new HistoryPage();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
+        MobileAds.initialize(this, "@string/admob_app_id");
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
 
         initCalilWebView();
 
