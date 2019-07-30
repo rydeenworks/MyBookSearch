@@ -1,8 +1,9 @@
 package com.rydeenworks.mybooksearch;
 
+import android.net.Uri;
+
 import java.util.EventListener;
 
 public interface BookLoadEventListener extends EventListener {
-    void OnBookLoad(String bookTitle, String url);
-    void OnAddAmazonBookHistory(String bookTitle, String isbn10);
+    void OnLinkClick(Uri uri);
 }
