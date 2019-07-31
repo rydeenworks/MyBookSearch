@@ -2,79 +2,41 @@ package com.rydeenworks.mybooksearch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class HistoryPage {
-    private final int HISTORY_MAX_NUM = 20;
+    private final int HISTORY_MAX_NUM = 100;
 
-    public void AddHistory (Context context, String keyword, String isbn10) {
+    public void AddHistory (Context context, String bookTitle, String isbn) {
 
         SharedPreferences sharedPref = context.getSharedPreferences(
                 context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
 
         //登録済みの履歴は追加しない
-        if( isExistHistoryKeyword(context, sharedPref, keyword) ) {
+        if( isExistHistoryBookTitle(context, sharedPref, bookTitle) ) {
             return;
         }
-        requestAmazonBookURL(context, isbn10);
-    }
 
-    private AmazonRequest.Listener createListener() {
-        return new AmazonRequest.Listener() {
-            @Override
-            public void onSuccess(Context context, String responseXML) {
-                if(responseXML != null) {
-                    //XMLからURL取得する
-                    String title = "";
-                    String url = "";
-                    SharedPreferences sharedPref = context.getSharedPreferences(
-                            context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-                    int lastIndex = getLastIndex(context, sharedPref);
-                    lastIndex = incrementLastIndex(lastIndex);
+        int lastIndex = getLastIndex(context, sharedPref);
+        lastIndex = incrementLastIndex(lastIndex);
+        saveHistory(sharedPref, lastIndex, bookTitle, isbn);
+        saveLastIndex(context, sharedPref, lastIndex);
 
-                    {
-                        Pattern pattern = Pattern.compile("<DetailPageURL>https://www\\.amazon\\.co\\.jp/.*</DetailPageURL>");
-                        Matcher matcher = pattern.matcher(responseXML);
-                        if (matcher.find()) {
-                            url = matcher.group();
-                            url = url.substring(15, url.length()-16);
-                        }
-                    }
-
-                    {
-                        Pattern pattern = Pattern.compile("<Title>.*</Title>");
-                        Matcher matcher = pattern.matcher(responseXML);
-                        if (matcher.find()) {
-                            title = matcher.group();
-                            title = title.substring(7, title.length()-8);
-                        }
-                    }
-
-                    if(title.isEmpty() || url.isEmpty()) {
-                        return;
-                    }
-
-                    saveHistory(sharedPref, lastIndex, title, url);
-                    saveLastIndex(context, sharedPref, lastIndex);
-                }
-            }
-        };
-    }
-
-
-    private void requestAmazonBookURL(Context context, String isbn10) {
-        AmazonRequest request = new AmazonRequest();
-        request.Init(context,
-                context.getString(R.string.access_key_id),
-                context.getString(R.string.secret_access_key),
-                context.getString(R.string.associate_tag));
-        request.setListener(createListener());
-        request.execute( AmazonRequest.AMAZON_REQUEST_TYPE_ITEM_LOOKUP, isbn10);
+        //test
+//        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
+//        try {
+//            Integer idx=0;
+//            for (JSONArray jsonArray : historyList) {
+//                Log.d("history", idx.toString() + " bookTitle:" + jsonArray.get(0)+ " " + jsonArray.get(1) );
+//                idx++;
+//            }
+//        } catch(Exception ex) {
+//            ex.printStackTrace();
+//        }
     }
 
     private int incrementLastIndex(int lastIndex) {
@@ -99,17 +61,17 @@ public class HistoryPage {
         return lastIndex;
     }
 
-    private void saveLastIndex(Context context, SharedPreferences sharedPref, int lastIncdx) {
+    private void saveLastIndex(Context context, SharedPreferences sharedPref, int lastIndex) {
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(context.getString(R.string.history_last_index_key), lastIncdx);
+        editor.putInt(context.getString(R.string.history_last_index_key), lastIndex);
         editor.commit();
     }
 
-    private void saveHistory(SharedPreferences sharedPref, int lastIndex, String keyword, String url) {
+    private void saveHistory(SharedPreferences sharedPref, int lastIndex, String bookTitle, String isbn) {
         SharedPreferences.Editor editor = sharedPref.edit();
         JSONArray jsonArray = new JSONArray();
-        jsonArray.put(keyword);
-        jsonArray.put(url);
+        jsonArray.put(bookTitle); //本のタイトル
+        jsonArray.put(isbn); //isbn
         editor.putString(Integer.toString(lastIndex), jsonArray.toString());
         editor.commit();
     }
@@ -121,6 +83,9 @@ public class HistoryPage {
         int currIndex = lastIndex;
         do {
             String strJson = sharedPref.getString(Integer.toString(currIndex), "");
+            if(strJson == null) {
+                break;
+            }
             if(strJson.isEmpty()) {
                 break;
             }
@@ -136,11 +101,11 @@ public class HistoryPage {
         return  historyList;
     }
 
-    private boolean isExistHistoryKeyword(Context context, SharedPreferences sharedPref, final String keyword) {
+    private boolean isExistHistoryBookTitle(Context context, SharedPreferences sharedPref, final String bookTitle) {
         ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
         try {
             for (JSONArray jsonArray : historyList) {
-                if(keyword.equals(jsonArray.get(0))) {
+                if(bookTitle.equals(jsonArray.get(0))) {
                     return true;
                 }
             }
@@ -156,8 +121,7 @@ public class HistoryPage {
                 context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
 
         ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
-        String webPage = createHtml(context, historyList);
-        return webPage;
+        return createHtml(context, historyList);
     }
 
     private String createHtml(Context context, ArrayList<JSONArray> historyList) {
@@ -166,9 +130,6 @@ public class HistoryPage {
         htmlBuilder.append("<html>");
         htmlBuilder.append("<head>");
         htmlBuilder.append("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-        htmlBuilder.append("<title>");
-        htmlBuilder.append(context.getString(R.string.web_page_title));
-        htmlBuilder.append("</title>");
         htmlBuilder.append("<style type=\"text/css\">");
         htmlBuilder.append(".header {");
         htmlBuilder.append("background-color: #bdf7f1;");
@@ -178,16 +139,16 @@ public class HistoryPage {
 
         htmlBuilder.append("<body>");
         htmlBuilder.append("<div class=\"header\">");
-        htmlBuilder.append("履歴一覧");
+        htmlBuilder.append("図書さがし履歴一覧");
         htmlBuilder.append("</div>");
         try {
             htmlBuilder.append("<br>");
             for (JSONArray jsonArray : historyList) {
-                // 普通のリンクを設定
                 htmlBuilder.append("<a href=\"");
-                htmlBuilder.append(jsonArray.get(1));   //URL
+                String url = "https://www.amazon.co.jp/gp/search?ie=UTF8&tag=dynamitecruis-22&linkCode=ur2&linkId=4b1da2ab20d2fa32b9230f88ddab039e&camp=247&creative=1211&index=books&keywords=" + jsonArray.get(0);
+                htmlBuilder.append(url);
                 htmlBuilder.append("\">");
-                htmlBuilder.append(jsonArray.get(0));   //keyword
+                htmlBuilder.append(jsonArray.get(0));
                 htmlBuilder.append("</a>");
                 htmlBuilder.append("<hr>");
                 htmlBuilder.append("<br>");

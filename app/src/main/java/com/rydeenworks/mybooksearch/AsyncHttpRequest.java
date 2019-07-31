@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class AsyncHttpRequest extends AsyncTask<String, Void, String> {
     private MainActivity mActivity;
@@ -29,13 +30,15 @@ public class AsyncHttpRequest extends AsyncTask<String, Void, String> {
                 int size = is.read(line);
                 if (size <= 0)
                     break;
-                String str = new String(line, "utf-8");
+                String str = new String(line, StandardCharsets.UTF_8);
                 src.append(str);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally{
-            connection.disconnect();
+            if(connection != null) {
+                connection.disconnect();
+            }
         }
         return new String(src);
     }
