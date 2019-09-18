@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
         setContentView(R.layout.activity_main);
 
+        setTitle("図書さがし");
+
         String admob_app_id = this.getString(R.string.admob_app_id);
         MobileAds.initialize(this, admob_app_id);
         AdView mAdView = findViewById(R.id.adView);
@@ -92,7 +94,10 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_show_help_page:
-//                showRecommendPage();
+                Uri uri = Uri.parse("https://rydeenworks.hatenablog.com/entry/2019/09/12/214733");
+                Intent i = new Intent(Intent.ACTION_VIEW,uri);
+                startActivity(i);
+
                 break;
         }
         return true;
