@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_export_history"
+        android:title="履歴を書き出す">
+    </item>
+    <item android:id="@+id/menu_import_history"
+        android:title="履歴を読み込む">
+    </item>
     <item android:id="@+id/menu_show_help_page"
         android:title="ヘルプ">
     </item>

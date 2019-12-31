@@ -1,21 +1,33 @@
 package com.rydeenworks.mybooksearch;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
+import org.json.JSONArray;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,11 +105,50 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_export_history:
+                ArrayList<JSONArray> history = historyPage.GetHistory(this);
+
+                copyToClipboard(this, "図書さがし履歴", history.toString());
+
+                Toast toast = Toast.makeText(this, "履歴をクリップボードにコピーしました", Toast.LENGTH_LONG);
+                toast.show();
+
+                break;
+            case R.id.menu_import_history:
+                final EditText editText = new EditText(this);
+                editText.setHint("ここへ書き出し内容を貼り付け");
+                new AlertDialog.Builder(this)
+                    .setTitle("履歴読み込み")
+                    .setMessage("履歴書き出し内容を貼り付けましょう")
+                    .setView(editText)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String history = editText.getText().toString();
+                            Log.d("AAA", history);
+
+                            try {
+                                JSONArray jarray = new JSONArray(history);
+                                for (int i = 0; i < jarray.length(); ++ i) {
+//                                  Log.d("AAA", jarray.getString(i));
+                                    JSONArray book = new JSONArray(jarray.getString(i));
+//                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
+                                    historyPage.AddHistory(getApplicationContext(), book.getString(0), book.getString(1));
+                                }
+                                showHistoryPage();
+                            }
+                            catch (org.json.JSONException e) {
+
+                            }
+                        }
+                    })
+                    .show();
+                break;
+
             case R.id.menu_show_help_page:
                 Uri uri = Uri.parse("https://rydeenworks.hatenablog.com/entry/2019/09/12/214733");
                 Intent i = new Intent(Intent.ACTION_VIEW,uri);
                 startActivity(i);
-
                 break;
         }
         return true;
@@ -169,5 +220,15 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
             Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
             toast.show();
         }
+    }
+
+    public static void copyToClipboard(Context context, String label, String text) {
+        // copy to clipboard
+        ClipboardManager clipboardManager =
+                (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        if (null == clipboardManager) {
+            return;
+        }
+        clipboardManager.setPrimaryClip(ClipData.newPlainText(label, text));
     }
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class HistoryPage {
     private final int HISTORY_MAX_NUM = 100;
 
-    public void AddHistory (Context context, String bookTitle, String isbn) {
+    public void AddHistory(Context context, String bookTitle, String isbn) {
 
         SharedPreferences sharedPref = context.getSharedPreferences(
                 context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
@@ -37,6 +37,13 @@ public class HistoryPage {
 //        } catch(Exception ex) {
 //            ex.printStackTrace();
 //        }
+    }
+
+    public ArrayList<JSONArray> GetHistory(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+
+        return getHistoryList(context, sharedPref);
     }
 
     private int incrementLastIndex(int lastIndex) {
