@@ -1,6 +1,7 @@
 package com.rydeenworks.mybooksearch;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -35,6 +37,12 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     private WebView calilWebView;
     private final CalilWebViewClient calilWebViewClient = new CalilWebViewClient();
     private final HistoryPage historyPage = new HistoryPage();
+
+    enum ViewMode{
+        VIEW_MODE_HISTORY,
+        VIEW_MODE_IMAGE,
+    }
+    private ViewMode mViewMode = ViewMode.VIEW_MODE_HISTORY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,8 +133,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String history = editText.getText().toString();
-                            Log.d("AAA", history);
-
                             try {
                                 JSONArray jarray = new JSONArray(history);
                                 for (int i = 0; i < jarray.length(); ++ i) {
@@ -144,7 +150,16 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                     })
                     .show();
                 break;
-
+            case R.id.print_books_image:
+                switch (mViewMode) {
+                    case VIEW_MODE_HISTORY:
+                        showBooksImagePage();
+                        break;
+                    case VIEW_MODE_IMAGE:
+                        showHistoryPage();
+                        break;
+                }
+                break;
             case R.id.menu_show_help_page:
                 Uri uri = Uri.parse("https://rydeenworks.hatenablog.com/entry/2019/09/12/214733");
                 Intent i = new Intent(Intent.ACTION_VIEW,uri);
@@ -169,6 +184,20 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     private void showHistoryPage() {
         String htmlString = historyPage.GetWebPage(this);
         calilWebView.loadData(htmlString, "text/html", "utf-8");
+        mViewMode = ViewMode.VIEW_MODE_HISTORY;
+    }
+
+    private void showBooksImagePage() {
+        int width = calilWebView.getWidth();
+        String htmlString = historyPage.GetImagePage(this, width);
+        calilWebView.loadData(htmlString, "text/html", "utf-8");
+
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        mViewMode = ViewMode.VIEW_MODE_IMAGE;
     }
 
     public void OnLoadBookHttp(String httpSrc) {
