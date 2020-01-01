@@ -142,6 +142,7 @@ public class HistoryPage {
         htmlBuilder.append("background-color: #bdf7f1;");
         htmlBuilder.append("}");
         htmlBuilder.append("</style>");
+        htmlBuilder.append("<style>img{display: inline;height: auto;max-width: 15%;}</style>");
         htmlBuilder.append("</head>");
 
         htmlBuilder.append("<body>");
@@ -151,14 +152,20 @@ public class HistoryPage {
         try {
             htmlBuilder.append("<br>");
             for (JSONArray jsonArray : historyList) {
-                htmlBuilder.append("<a href=\"");
+                htmlBuilder.append("<img align=\"left\" src=\"");
+                String img_url = "https://cover.openbd.jp/" + jsonArray.get(1) + ".jpg\" ";
+                htmlBuilder.append(img_url);
+                htmlBuilder.append("alt=\"" + jsonArray.get(0) + "\" style=\"border:solid 1px #000000\"");
+                htmlBuilder.append(">");
+                htmlBuilder.append("<a style=\"font-size: 20px\" href=\"");
                 String url = "https://www.amazon.co.jp/gp/search?ie=UTF8&tag=dynamitecruis-22&linkCode=ur2&linkId=4b1da2ab20d2fa32b9230f88ddab039e&camp=247&creative=1211&index=books&keywords=" + jsonArray.get(0);
                 htmlBuilder.append(url);
                 htmlBuilder.append("\">");
                 htmlBuilder.append(jsonArray.get(0));
                 htmlBuilder.append("</a>");
+                htmlBuilder.append("<br clear=\"left\"");
                 htmlBuilder.append("<hr>");
-                htmlBuilder.append("<br>");
+                htmlBuilder.append("<hr>");
             }
         } catch(Exception ex) {
             ex.printStackTrace();
