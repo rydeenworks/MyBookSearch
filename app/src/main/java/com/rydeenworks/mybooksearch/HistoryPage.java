@@ -11,6 +11,14 @@ import java.util.ArrayList;
 public class HistoryPage {
     private final int HISTORY_MAX_NUM = 100;
 
+    //本の履歴件数を返す( 0 - 99 ) 履歴がない場合は -1
+    public int GetBookHistoryNum(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+        return getLastIndex(context, sharedPref);
+    }
+
+
     public void AddHistory(Context context, String bookTitle, String isbn) {
 
         SharedPreferences sharedPref = context.getSharedPreferences(
@@ -62,6 +70,8 @@ public class HistoryPage {
         return lastIndex;
     }
 
+    // 0 <= lastIndex < HISTORY_MAX_NUM -1
+    // プリファレンスがない場合は -1
     private int getLastIndex(Context context, SharedPreferences sharedPref) {
         int lastIndex = -1;
         lastIndex = sharedPref.getInt(context.getString(R.string.history_last_index_key), lastIndex);

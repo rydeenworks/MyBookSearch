@@ -2,4 +2,6 @@
     <string name="app_name">図書さがし</string>
     <string name="preference_history_file_key">com.rydeenworks.mybooksearch.PREFERENCE_HISTORY_FILE_KEY</string>
     <string name="history_last_index_key">com.rydeenworks.mybooksearch.HISTORY_LAST_INDEX_KEY</string>
+    <string name="app_is_reviewd">com.rydeenworks.mybooksearch.PREFERENCE_APP_IS_REVIWED</string>
+    <string name="app_is_approached">com.rydeenworks.mybooksearch.PREFERENCE_APP_IS_APPROACHED</string>
 </resources>

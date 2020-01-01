@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -59,7 +60,51 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 //        String adUnitId = mAdView.getAdUnitId();
 
         initCalilWebView();
-        searchBookPage();;
+        searchBookPage();
+    }
+
+    private void showReviewDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("レビューにご協力お願いします")
+                .setMessage("いつもご利用ありがとうございます。よろしければ励ましのレビューをお寄せください")
+                .setPositiveButton("レビューする", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Context context = getApplicationContext();
+                        SharedPreferences sharedPref = context.getSharedPreferences(
+                                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean(context.getString(R.string.app_is_reviewd), true);
+                        editor.commit();
+
+                        Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch");
+                        Intent i = new Intent(Intent.ACTION_VIEW,uri);
+                        startActivity(i);
+                    }
+                })
+                .setNeutralButton("その他要望", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Context context = getApplicationContext();
+                        SharedPreferences sharedPref = context.getSharedPreferences(
+                                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean(context.getString(R.string.app_is_approached), true);
+                        editor.commit();
+
+                        Uri uri = Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSegGYDdqtw9gq8xZSb4yqORgFE5A4uQzR0RBrFDtLfsIDfs3g/viewform?usp=sf_link");
+                        Intent i = new Intent(Intent.ACTION_VIEW,uri);
+                        startActivity(i);
+                    }
+                })
+                .setNegativeButton("また今度", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //処理なし
+                    }
+                })
+                .show();
+
     }
 
     private void searchBookPage() {
@@ -76,11 +121,25 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
             return;
         }
 
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+        Boolean isAppApproached = sharedPref.getBoolean(context.getString(R.string.app_is_approached), false);
+        Boolean isAppReviewed = sharedPref.getBoolean(context.getString(R.string.app_is_reviewd), false);
+
+        if( isAppApproached == false && isAppReviewed == false)
+        {
+            // 10冊検索するごとに表示する
+            int num = historyPage.GetBookHistoryNum(this);
+            if( num > 0 && (num % 10) == 0 ) {
+                showReviewDialog();
+            }
+        }
+
         Toast toast = Toast.makeText(this, "本を検索中・・・", Toast.LENGTH_LONG);
         toast.show();
 
         new AsyncHttpRequest(this).execute(bookPageUrl);
-
     }
 
     @Override
@@ -170,6 +229,9 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                 Uri uri = Uri.parse("https://rydeenworks.hatenablog.com/entry/2019/09/12/214733");
                 Intent i = new Intent(Intent.ACTION_VIEW,uri);
                 startActivity(i);
+                break;
+            case R.id.menu_app_review:
+                showReviewDialog();
                 break;
         }
         return true;
