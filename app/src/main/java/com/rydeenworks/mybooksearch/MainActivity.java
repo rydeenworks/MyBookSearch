@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
             case R.id.menu_import_history:
                 final EditText editText = new EditText(this);
                 editText.setHint("ここへ書き出し内容を貼り付け");
+                editText.setHeight(400);
                 new AlertDialog.Builder(this)
                     .setTitle("履歴読み込み")
                     .setMessage("履歴書き出し内容を貼り付けましょう")
@@ -146,6 +147,12 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                             catch (org.json.JSONException e) {
 
                             }
+                        }
+                    })
+                    .setNegativeButton("キャンセル", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //処理なし
                         }
                     })
                     .show();
