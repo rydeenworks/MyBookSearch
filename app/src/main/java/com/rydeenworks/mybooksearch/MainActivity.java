@@ -271,29 +271,43 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     }
 
     public void OnLoadBookHttp(String httpSrc) {
-        String bookTitle;
+        String bookTitle = "";
         {
             final String TITLE_TAG_START = "<title>";
             final String TITLE_TAG_END = "</title>";
             final int idxStart = httpSrc.indexOf(TITLE_TAG_START);
-            if(idxStart == -1) {
-                Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
-                toast.show();
-                return;
-            }
             final int idxEnd = httpSrc.indexOf(TITLE_TAG_END);
-            if(idxEnd == -1) {
-                Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
-                toast.show();
-                return;
-            }
-            bookTitle = httpSrc.substring(idxStart + TITLE_TAG_START.length(), idxEnd);
-            final int idxSeparator = bookTitle.indexOf("|");
-            if( idxSeparator != -1) {
-                bookTitle = bookTitle.substring(0, idxSeparator);
-            }
-            bookTitle = bookTitle.trim();
+
+            if(idxStart != -1 && idxEnd != -1)
+            {
+                bookTitle = httpSrc.substring(idxStart + TITLE_TAG_START.length(), idxEnd);
+                final int idxSeparator = bookTitle.indexOf("|");
+                if( idxSeparator != -1) {
+                    bookTitle = bookTitle.substring(0, idxSeparator);
+                }
+                bookTitle = bookTitle.trim();
 //        <title>忙しい人専用 「つくりおき食堂」の超簡単レシピ (扶桑社ムック) | 若菜 まりえ |本 | 通販 | Amazon</title>
+            }else{
+                final String BOOK_TITLE_TAG = "<h1 id=\"title\" class=\"a-size-medium\">";
+                final int idx = httpSrc.indexOf(BOOK_TITLE_TAG);
+                if(idx != -1)
+                {
+                    Log.d("AAA", "</title> found at " + idx);
+                    final int idxLineEnd = httpSrc.indexOf("\n", idx);
+                    if(idxLineEnd != -1)
+                    {
+                        bookTitle = httpSrc.substring(idx + BOOK_TITLE_TAG.length(), idxLineEnd);
+//                        Log.d("AAA", httpSrc.substring(idx + BOOK_TITLE_TAG.length(), idxLineEnd));
+                    }
+                }
+            }
+        }
+
+        if(bookTitle.isEmpty())
+        {
+            Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
+            toast.show();
+            return;
         }
 
         final String ISBN13_TAG = "ISBN-13";
@@ -301,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         if(idx == -1) {
             Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
             toast.show();
+//            Log.d("AAA", "ISBN-13 not found");
             return;
         }
         String isbnHtml = httpSrc.substring(idx, idx+100);  //100文字以内でマッチングできるはず
