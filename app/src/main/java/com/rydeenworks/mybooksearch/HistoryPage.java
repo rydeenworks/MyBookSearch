@@ -151,8 +151,9 @@ public class HistoryPage {
         htmlBuilder.append(".header {");
         htmlBuilder.append("background-color: #bdf7f1;");
         htmlBuilder.append("}");
+        htmlBuilder.append("a {  font-family: \"Helvetica Neue\", Arial, \"Hiragino Kaku Gothic ProN\", \"Hiragino Sans\", Meiryo, sans-serif;}");
         htmlBuilder.append("</style>");
-        htmlBuilder.append("<style>img{display: inline;height: auto;max-width: 15%;}</style>");
+        htmlBuilder.append("<style>img{display: inline;height: auto;max-width: 10%;} </style>");
         htmlBuilder.append("</head>");
 
         htmlBuilder.append("<body>");
@@ -167,7 +168,7 @@ public class HistoryPage {
                 htmlBuilder.append(img_url);
                 htmlBuilder.append("alt=\"" + jsonArray.get(0) + "\" style=\"border:solid 1px #000000\"");
                 htmlBuilder.append(">");
-                htmlBuilder.append("<a style=\"font-size: 20px\" href=\"");
+                htmlBuilder.append("<a href=\"");
                 String url = "https://www.amazon.co.jp/gp/search?ie=UTF8&tag=dynamitecruis-22&linkCode=ur2&linkId=4b1da2ab20d2fa32b9230f88ddab039e&camp=247&creative=1211&index=books&keywords=" + jsonArray.get(0);
                 htmlBuilder.append(url);
                 htmlBuilder.append("\">");
