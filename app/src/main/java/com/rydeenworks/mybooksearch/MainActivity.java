@@ -2,7 +2,6 @@ package com.rydeenworks.mybooksearch;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -22,10 +21,6 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -42,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         VIEW_MODE_IMAGE,
     }
     private ViewMode mViewMode = ViewMode.VIEW_MODE_HISTORY;
-    AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +45,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         setContentView(R.layout.activity_main);
 
         setTitle("図書さがし");
-
-        String admob_app_id = this.getString(R.string.admob_app_id);
-        MobileAds.initialize(this, admob_app_id);
-        mAdView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-//        String adUnitId = mAdView.getAdUnitId();
 
         initCalilWebView();
         searchBookPage();
@@ -253,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         String htmlString = historyPage.GetWebPage(this);
         calilWebView.loadData(htmlString, "text/html", "utf-8");
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
-        mAdView.setVisibility(View.VISIBLE);
     }
 
     private void showBooksImagePage() {
@@ -267,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         decorView.setSystemUiVisibility(uiOptions);
 
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
-        mAdView.setVisibility(View.GONE);
     }
 
     public void OnLoadBookHttp(String httpSrc) {

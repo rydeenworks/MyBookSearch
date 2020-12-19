@@ -4,4 +4,6 @@
     <string name="history_last_index_key">com.rydeenworks.mybooksearch.HISTORY_LAST_INDEX_KEY</string>
     <string name="app_is_reviewd">com.rydeenworks.mybooksearch.PREFERENCE_APP_IS_REVIWED</string>
     <string name="app_is_approached">com.rydeenworks.mybooksearch.PREFERENCE_APP_IS_APPROACHED</string>
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>    <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
+    <string name="admob_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string> <!-- 広告ユニットテストID -->
 </resources>
