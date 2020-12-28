@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class AsyncHttpRequest extends AsyncTask<String, Void, String> {
+public class AsyncHttpRequest extends AsyncTask<String, Void, Boolean> {
     private MainActivity mActivity;
 
     public AsyncHttpRequest(MainActivity activity) {
@@ -17,11 +17,24 @@ public class AsyncHttpRequest extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected Boolean doInBackground(String... params) {
+        Boolean success = false;
+        String html = "";
+        for(int i=0; i<10; i++){ // 10回ほどリトライする
+            html = downloadHtml(params[0]);
+            success = mActivity.OnLoadBookHttp(html);
+            if(success) {
+                break;
+            }
+        }
+        return success;
+    }
+
+    public String downloadHtml(String targetURL) {
         HttpURLConnection connection = null;
         StringBuilder src = new StringBuilder();
         try {
-            URL url = new URL(params[0]);
+            URL url = new URL(targetURL);
             connection = (HttpURLConnection) url.openConnection();
             InputStream is = connection.getInputStream();
 
@@ -43,7 +56,7 @@ public class AsyncHttpRequest extends AsyncTask<String, Void, String> {
         return new String(src);
     }
 
-    public void onPostExecute(String string) {
-        mActivity.OnLoadBookHttp(string);
+    public void onPostExecute(Boolean result) {
+        mActivity.NotifyBookSearchResul(result);
     }
 }

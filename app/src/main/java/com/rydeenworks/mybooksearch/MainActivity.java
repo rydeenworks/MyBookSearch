@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                             String history = editText.getText().toString();
                             try {
                                 JSONArray jarray = new JSONArray(history);
-                                for (int i = 0; i < jarray.length(); ++ i) {
+                                for (int i = jarray.length() - 1; i >= 0;  --i) {
 //                                  Log.d("AAA", jarray.getString(i));
                                     JSONArray book = new JSONArray(jarray.getString(i));
 //                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
@@ -238,14 +239,16 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
     private void showHistoryPage() {
         String htmlString = historyPage.GetWebPage(this);
-        calilWebView.loadData(htmlString, "text/html", "utf-8");
+        String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
+        calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
 
     private void showBooksImagePage() {
         int width = calilWebView.getWidth();
         String htmlString = historyPage.GetImagePage(this, width);
-        calilWebView.loadData(htmlString, "text/html", "utf-8");
+        String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
+        calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
@@ -255,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
     }
 
-    public void OnLoadBookHttp(String httpSrc) {
+    public Boolean OnLoadBookHttp(String httpSrc) {
         String bookTitle = "";
         {
             final String TITLE_TAG_START = "<title>";
@@ -277,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                 final int idx = httpSrc.indexOf(BOOK_TITLE_TAG);
                 if(idx != -1)
                 {
-                    Log.d("AAA", "</title> found at " + idx);
+//                    Log.d("AAA", "</title> found at " + idx);
                     final int idxLineEnd = httpSrc.indexOf("\n", idx);
                     if(idxLineEnd != -1)
                     {
@@ -290,18 +293,14 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
         if(bookTitle.isEmpty())
         {
-            Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
-            toast.show();
-            return;
+            return false;
         }
 
         final String ISBN13_TAG = "ISBN-13";
         final int idx = httpSrc.indexOf(ISBN13_TAG);
         if(idx == -1) {
-            Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
-            toast.show();
 //            Log.d("AAA", "ISBN-13 not found");
-            return;
+            return false;
         }
         String isbnHtml = httpSrc.substring(idx, idx+100);  //100文字以内でマッチングできるはず
 
@@ -315,7 +314,14 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
             historyPage.AddHistory(this, bookTitle, isbn);
             showHistoryPage();
+            return true;
         }else{
+            return false;
+        }
+    }
+
+    public void NotifyBookSearchResul(Boolean success) {
+        if(!success) {
             Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
             toast.show();
         }
