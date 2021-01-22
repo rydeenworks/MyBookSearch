@@ -238,18 +238,28 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     }
 
     private void showHistoryPage() {
-        String htmlString = historyPage.GetWebPage(this);
-        String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
-        calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
+        calilWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                String htmlString = historyPage.GetWebPage(MainActivity.this);
+                String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
+                calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
+            }
+        });
+
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
 
     private void showBooksImagePage() {
-        int width = calilWebView.getWidth();
-        String htmlString = historyPage.GetImagePage(this, width);
-        String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
-        calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
-
+        calilWebView.post(new Runnable() {
+            @Override
+            public void run() {
+                int width = calilWebView.getWidth();
+                String htmlString = historyPage.GetImagePage(MainActivity.this, width);
+                String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
+                calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
+            }
+        });
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -302,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 //            Log.d("AAA", "ISBN-13 not found");
             return false;
         }
-        String isbnHtml = httpSrc.substring(idx, idx+100);  //100文字以内でマッチングできるはず
+        String isbnHtml = httpSrc.substring(idx, idx+1000);  //100文字以内でマッチングできるはず
 
         Pattern p = Pattern.compile("[0-9]{3}-[0-9]{9}[0-9|X]");
         Matcher m = p.matcher(isbnHtml);
