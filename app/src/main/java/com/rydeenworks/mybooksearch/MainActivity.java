@@ -260,10 +260,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                 calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
             }
         });
-        View decorView = getWindow().getDecorView();
-        // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
 
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
     }
