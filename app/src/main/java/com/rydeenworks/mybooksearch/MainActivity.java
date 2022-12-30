@@ -1,5 +1,7 @@
 package com.rydeenworks.mybooksearch;
 
+import static android.content.Intent.FLAG_ACTIVITY_REQUIRE_DEFAULT;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -147,8 +149,18 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
     @Override
     public void OnLinkClick(Uri uri) {
-        Intent i = new Intent(Intent.ACTION_VIEW,uri);
-        startActivity(i);
+        try {
+            Intent i = new Intent();
+            i.setPackage("com.android.chrome");
+            i.setAction(Intent.ACTION_VIEW);
+            i.setData(uri);
+            startActivity(i);
+        }
+        catch (Exception e)
+        {
+            Toast toast = Toast.makeText(this, "ブラウザ起動に失敗しました", Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     @Override
