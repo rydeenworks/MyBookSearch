@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class HistoryPage {
     private final int HISTORY_MAX_NUM = 100;
     private final BookRepository bookRepository;
-    private SharedPreferences sharedPrefBooks;
+    private final SharedPreferences sharedPrefBooks;
     private final String historyLastIndexKeyStr;
 
     public HistoryPage(Context context)
@@ -23,7 +23,7 @@ public class HistoryPage {
     }
 
     //本の履歴件数を返す( 0 - 99 ) 履歴がない場合は -1
-    public int GetBookHistoryNum(Context context) {
+    public int GetBookHistoryNum() {
         int num = getLastIndex();
         int retNum =bookRepository.getBookNum();
         return retNum;
@@ -32,7 +32,7 @@ public class HistoryPage {
 
     public void AddHistory(Context context, String bookTitle, String isbn) {
         //登録済みの履歴は追加しない
-        if( isExistHistoryBookTitle(context, sharedPrefBooks, bookTitle) ) {
+        if( isExistHistoryBookTitle(bookTitle) ) {
             return;
         }
 
@@ -54,8 +54,8 @@ public class HistoryPage {
 //        }
     }
 
-    public ArrayList<JSONArray> GetHistory(Context context) {
-        return getHistoryList(context, sharedPrefBooks);
+    public ArrayList<JSONArray> GetHistory() {
+        return getHistoryList();
     }
 
     private int incrementLastIndex(int lastIndex) {
@@ -95,13 +95,13 @@ public class HistoryPage {
         editor.commit();
     }
 
-    private ArrayList< JSONArray > getHistoryList(Context context, SharedPreferences sharedPref) {
+    private ArrayList< JSONArray > getHistoryList() {
         ArrayList<JSONArray> historyList = new ArrayList<>();
 
         final int lastIndex = getLastIndex();
         int currIndex = lastIndex;
         do {
-            String strJson = sharedPref.getString(Integer.toString(currIndex), "");
+            String strJson = sharedPrefBooks.getString(Integer.toString(currIndex), "");
             if(strJson == null) {
                 break;
             }
@@ -120,8 +120,8 @@ public class HistoryPage {
         return  historyList;
     }
 
-    private boolean isExistHistoryBookTitle(Context context, SharedPreferences sharedPref, final String bookTitle) {
-        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
+    private boolean isExistHistoryBookTitle(final String bookTitle) {
+        ArrayList<JSONArray> historyList = getHistoryList();
         try {
             for (JSONArray jsonArray : historyList) {
                 if(bookTitle.equals(jsonArray.get(0))) {
@@ -135,12 +135,12 @@ public class HistoryPage {
         return false;
     }
 
-    public String GetWebPage (Context context) {
-        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPrefBooks);
-        return createHtml(context, historyList);
+    public String GetWebPage () {
+        ArrayList<JSONArray> historyList = getHistoryList();
+        return createHtml(historyList);
     }
 
-    private String createHtml(Context context, ArrayList<JSONArray> historyList) {
+    private String createHtml(ArrayList<JSONArray> historyList) {
         StringBuilder htmlBuilder = new StringBuilder();
 
         htmlBuilder.append("<html>");
@@ -188,13 +188,13 @@ public class HistoryPage {
         return htmlBuilder.toString();
     }
 
-    public String GetImagePage (Context context, int view_width) {
-        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPrefBooks);
-        return createImageHtml(context, historyList, view_width);
+    public String GetImagePage () {
+        ArrayList<JSONArray> historyList = getHistoryList();
+        return createImageHtml(historyList);
     }
 
 
-    private String createImageHtml(Context context, ArrayList<JSONArray> historyList, int viewWidth) {
+    private String createImageHtml( ArrayList<JSONArray> historyList) {
         StringBuilder htmlBuilder = new StringBuilder();
 
         htmlBuilder.append("<html>");

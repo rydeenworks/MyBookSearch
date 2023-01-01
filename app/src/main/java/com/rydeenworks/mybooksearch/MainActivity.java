@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         if( isAppApproached == false && isAppReviewed == false)
         {
             // 10冊検索するごとに表示する
-            int num = historyPage.GetBookHistoryNum(this);
+            int num = historyPage.GetBookHistoryNum();
             if( num > 0 && (num % 10) == 0 ) {
                 showReviewDialog();
             }
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_export_history:
-                ArrayList<JSONArray> history = historyPage.GetHistory(this);
+                ArrayList<JSONArray> history = historyPage.GetHistory();
 
                 copyToClipboard(this, "図書さがし履歴", history.toString());
 
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         calilWebView.post(new Runnable() {
             @Override
             public void run() {
-                String htmlString = historyPage.GetWebPage(MainActivity.this);
+                String htmlString = historyPage.GetWebPage();
                 String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
                 calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
             }
@@ -268,8 +268,8 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         calilWebView.post(new Runnable() {
             @Override
             public void run() {
-                int width = calilWebView.getWidth();
-                String htmlString = historyPage.GetImagePage(MainActivity.this, width);
+//                int width = calilWebView.getWidth();
+                String htmlString = historyPage.GetImagePage();
                 String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
                 calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
             }
