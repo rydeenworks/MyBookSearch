@@ -2,37 +2,44 @@ package com.rydeenworks.mybooksearch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
-
+import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import org.json.JSONArray;
-
 import java.util.ArrayList;
 
 public class HistoryPage {
     private final int HISTORY_MAX_NUM = 100;
+    private final BookRepository bookRepository;
+    private SharedPreferences sharedPrefBooks;
+    private final String historyLastIndexKeyStr;
+
+    public HistoryPage(Context context)
+    {
+        sharedPrefBooks = context.getSharedPreferences(
+                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+        historyLastIndexKeyStr = context.getString(R.string.history_last_index_key);
+        bookRepository = new BookRepository(
+                context.getString(R.string.history_last_index_key),
+                sharedPrefBooks);
+    }
 
     //本の履歴件数を返す( 0 - 99 ) 履歴がない場合は -1
     public int GetBookHistoryNum(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-        return getLastIndex(context, sharedPref);
+        int num = getLastIndex();
+        int retNum =bookRepository.getBookNum();
+        return retNum;
     }
 
 
     public void AddHistory(Context context, String bookTitle, String isbn) {
-
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-
         //登録済みの履歴は追加しない
-        if( isExistHistoryBookTitle(context, sharedPref, bookTitle) ) {
+        if( isExistHistoryBookTitle(context, sharedPrefBooks, bookTitle) ) {
             return;
         }
 
-        int lastIndex = getLastIndex(context, sharedPref);
+        int lastIndex = getLastIndex();
         lastIndex = incrementLastIndex(lastIndex);
-        saveHistory(sharedPref, lastIndex, bookTitle, isbn);
-        saveLastIndex(context, sharedPref, lastIndex);
+        saveHistory(sharedPrefBooks, lastIndex, bookTitle, isbn);
+        saveLastIndex(context, sharedPrefBooks, lastIndex);
 
         //test
 //        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
@@ -48,10 +55,7 @@ public class HistoryPage {
     }
 
     public ArrayList<JSONArray> GetHistory(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-
-        return getHistoryList(context, sharedPref);
+        return getHistoryList(context, sharedPrefBooks);
     }
 
     private int incrementLastIndex(int lastIndex) {
@@ -72,10 +76,8 @@ public class HistoryPage {
 
     // 0 <= lastIndex < HISTORY_MAX_NUM -1
     // プリファレンスがない場合は -1
-    private int getLastIndex(Context context, SharedPreferences sharedPref) {
-        int lastIndex = -1;
-        lastIndex = sharedPref.getInt(context.getString(R.string.history_last_index_key), lastIndex);
-        return lastIndex;
+    private int getLastIndex() {
+        return  sharedPrefBooks.getInt(historyLastIndexKeyStr, -1);
     }
 
     private void saveLastIndex(Context context, SharedPreferences sharedPref, int lastIndex) {
@@ -96,7 +98,7 @@ public class HistoryPage {
     private ArrayList< JSONArray > getHistoryList(Context context, SharedPreferences sharedPref) {
         ArrayList<JSONArray> historyList = new ArrayList<>();
 
-        final int lastIndex = getLastIndex(context, sharedPref);
+        final int lastIndex = getLastIndex();
         int currIndex = lastIndex;
         do {
             String strJson = sharedPref.getString(Integer.toString(currIndex), "");
@@ -134,10 +136,7 @@ public class HistoryPage {
     }
 
     public String GetWebPage (Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-
-        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
+        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPrefBooks);
         return createHtml(context, historyList);
     }
 
@@ -190,10 +189,7 @@ public class HistoryPage {
     }
 
     public String GetImagePage (Context context, int view_width) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-
-        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
+        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPrefBooks);
         return createImageHtml(context, historyList, view_width);
     }
 

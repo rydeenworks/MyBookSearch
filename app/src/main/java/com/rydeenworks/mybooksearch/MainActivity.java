@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity implements BookLoadEventListener {
     private WebView calilWebView;
     private final CalilWebViewClient calilWebViewClient = new CalilWebViewClient();
-    private final HistoryPage historyPage = new HistoryPage();
+    private HistoryPage historyPage;
 
     enum ViewMode{
         VIEW_MODE_HISTORY,
@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        historyPage = new HistoryPage(this);
 
         setContentView(R.layout.activity_main);
 
