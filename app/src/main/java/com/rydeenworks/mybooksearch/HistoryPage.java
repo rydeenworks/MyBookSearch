@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 
 public class HistoryPage {
-    private final int HISTORY_MAX_NUM = 100;
     private final BookRepository bookRepository;
     private final SharedPreferences sharedPrefBooks;
     private final String historyLastIndexKeyStr;
@@ -18,125 +17,26 @@ public class HistoryPage {
                 context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
         historyLastIndexKeyStr = context.getString(R.string.history_last_index_key);
         bookRepository = new BookRepository(
-                context.getString(R.string.history_last_index_key),
+                historyLastIndexKeyStr,
                 sharedPrefBooks);
     }
 
     //本の履歴件数を返す( 0 - 99 ) 履歴がない場合は -1
     public int GetBookHistoryNum() {
-        int num = getLastIndex();
         int retNum =bookRepository.getBookNum();
         return retNum;
     }
 
-
-    public void AddHistory(Context context, String bookTitle, String isbn) {
-        //登録済みの履歴は追加しない
-        if( isExistHistoryBookTitle(bookTitle) ) {
-            return;
-        }
-
-        int lastIndex = getLastIndex();
-        lastIndex = incrementLastIndex(lastIndex);
-        saveHistory(sharedPrefBooks, lastIndex, bookTitle, isbn);
-        saveLastIndex(context, sharedPrefBooks, lastIndex);
-
-        //test
-//        ArrayList<JSONArray> historyList = getHistoryList(context, sharedPref);
-//        try {
-//            Integer idx=0;
-//            for (JSONArray jsonArray : historyList) {
-//                Log.d("history", idx.toString() + " bookTitle:" + jsonArray.get(0)+ " " + jsonArray.get(1) );
-//                idx++;
-//            }
-//        } catch(Exception ex) {
-//            ex.printStackTrace();
-//        }
+    public void AddHistory(String bookTitle, String isbn) {
+        bookRepository.addBook(bookTitle, isbn);
     }
 
     public ArrayList<JSONArray> GetHistory() {
-        return getHistoryList();
-    }
-
-    private int incrementLastIndex(int lastIndex) {
-        lastIndex++;
-        if(lastIndex == HISTORY_MAX_NUM) {
-            lastIndex = 0;
-        }
-        return lastIndex;
-    }
-
-    private int decrementLastIndex(int lastIndex) {
-        lastIndex--;
-        if(lastIndex == -1) {
-            lastIndex = HISTORY_MAX_NUM -1;
-        }
-        return lastIndex;
-    }
-
-    // 0 <= lastIndex < HISTORY_MAX_NUM -1
-    // プリファレンスがない場合は -1
-    private int getLastIndex() {
-        return  sharedPrefBooks.getInt(historyLastIndexKeyStr, -1);
-    }
-
-    private void saveLastIndex(Context context, SharedPreferences sharedPref, int lastIndex) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(context.getString(R.string.history_last_index_key), lastIndex);
-        editor.commit();
-    }
-
-    private void saveHistory(SharedPreferences sharedPref, int lastIndex, String bookTitle, String isbn) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(bookTitle); //本のタイトル
-        jsonArray.put(isbn); //isbn
-        editor.putString(Integer.toString(lastIndex), jsonArray.toString());
-        editor.commit();
-    }
-
-    private ArrayList< JSONArray > getHistoryList() {
-        ArrayList<JSONArray> historyList = new ArrayList<>();
-
-        final int lastIndex = getLastIndex();
-        int currIndex = lastIndex;
-        do {
-            String strJson = sharedPrefBooks.getString(Integer.toString(currIndex), "");
-            if(strJson == null) {
-                break;
-            }
-            if(strJson.isEmpty()) {
-                break;
-            }
-            try {
-                JSONArray jsonAry = new JSONArray(strJson);
-                historyList.add(jsonAry);
-            } catch(Exception ex) {
-                ex.printStackTrace();
-                break;
-            }
-            currIndex = decrementLastIndex(currIndex);
-        }while (currIndex != lastIndex);
-        return  historyList;
-    }
-
-    private boolean isExistHistoryBookTitle(final String bookTitle) {
-        ArrayList<JSONArray> historyList = getHistoryList();
-        try {
-            for (JSONArray jsonArray : historyList) {
-                if(bookTitle.equals(jsonArray.get(0))) {
-                    return true;
-                }
-            }
-        } catch(Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return false;
+        return bookRepository.getHistoryList();
     }
 
     public String GetWebPage () {
-        ArrayList<JSONArray> historyList = getHistoryList();
+        ArrayList<JSONArray> historyList = bookRepository.getHistoryList();
         return createHtml(historyList);
     }
 
@@ -189,7 +89,7 @@ public class HistoryPage {
     }
 
     public String GetImagePage () {
-        ArrayList<JSONArray> historyList = getHistoryList();
+        ArrayList<JSONArray> historyList = bookRepository.getHistoryList();
         return createImageHtml(historyList);
     }
 

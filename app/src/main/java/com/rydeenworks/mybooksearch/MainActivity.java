@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 //                                  Log.d("AAA", jarray.getString(i));
                                     JSONArray book = new JSONArray(jarray.getString(i));
 //                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
-                                    historyPage.AddHistory(getApplicationContext(), book.getString(0), book.getString(1));
+                                    historyPage.AddHistory(book.getString(0), book.getString(1));
                                 }
                                 showHistoryPage();
                             }
@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
             Intent intent = new Intent(Intent.ACTION_VIEW,uri);
             startActivity(intent);
 
-            historyPage.AddHistory(this, bookTitle, isbn);
+            historyPage.AddHistory(bookTitle, isbn);
             showHistoryPage();
             return true;
         }else{
