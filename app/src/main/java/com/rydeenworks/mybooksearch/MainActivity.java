@@ -5,10 +5,7 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,8 +17,11 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.infrastructure.AsyncHttpRequest;
+import com.rydeenworks.mybooksearch.usecase.CustomerStatusService;
 import com.rydeenworks.mybooksearch.usecase.ParseAmazonHtml;
 
 import org.json.JSONArray;
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     private WebView calilWebView;
     private final CalilWebViewClient calilWebViewClient = new CalilWebViewClient();
     private HistoryPage historyPage;
+    private CustomerStatusService customerStatusService;
 
     enum ViewMode{
         VIEW_MODE_HISTORY,
@@ -45,6 +46,14 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
         historyPage = new HistoryPage(this);
 
+        Context context = getApplicationContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+        customerStatusService = new CustomerStatusService(
+                sharedPref,
+                context.getString(R.string.app_is_reviewd));
+
+
         setContentView(R.layout.activity_main);
 
         setTitle("図書さがし");
@@ -57,41 +66,20 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         new AlertDialog.Builder(this)
                 .setTitle("レビューにご協力お願いします")
                 .setMessage("いつもご利用ありがとうございます。よろしければ励ましのレビューをお寄せください")
-                .setPositiveButton("レビューする", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Context context = getApplicationContext();
-                        SharedPreferences sharedPref = context.getSharedPreferences(
-                                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putBoolean(context.getString(R.string.app_is_reviewd), true);
-                        editor.commit();
+                .setPositiveButton("レビューする", (dialog, which) -> {
+                    customerStatusService.saveAppReviewFlag();
 
-                        Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch");
-                        Intent i = new Intent(Intent.ACTION_VIEW,uri);
-                        startActivity(i);
-                    }
+                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch");
+                    Intent i = new Intent(Intent.ACTION_VIEW,uri);
+                    startActivity(i);
                 })
-                .setNeutralButton("その他要望", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Context context = getApplicationContext();
-                        SharedPreferences sharedPref = context.getSharedPreferences(
-                                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putBoolean(context.getString(R.string.app_is_approached), true);
-                        editor.commit();
-
-                        Uri uri = Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSegGYDdqtw9gq8xZSb4yqORgFE5A4uQzR0RBrFDtLfsIDfs3g/viewform?usp=sf_link");
-                        Intent i = new Intent(Intent.ACTION_VIEW,uri);
-                        startActivity(i);
-                    }
+                .setNeutralButton("その他要望", (dialog, which) -> {
+                    Uri uri = Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSegGYDdqtw9gq8xZSb4yqORgFE5A4uQzR0RBrFDtLfsIDfs3g/viewform?usp=sf_link");
+                    Intent i = new Intent(Intent.ACTION_VIEW,uri);
+                    startActivity(i);
                 })
-                .setNegativeButton("また今度", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //処理なし
-                    }
+                .setNegativeButton("また今度", (dialog, which) -> {
+                    //処理なし
                 })
                 .show();
 
@@ -111,17 +99,11 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
             return;
         }
 
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-        Boolean isAppApproached = sharedPref.getBoolean(context.getString(R.string.app_is_approached), false);
-        Boolean isAppReviewed = sharedPref.getBoolean(context.getString(R.string.app_is_reviewd), false);
-
-        if( isAppApproached == false && isAppReviewed == false)
+        if( !customerStatusService.isAppReviewed())
         {
-            // 10冊検索するごとに表示する
+            // 4冊検索するごとに表示する
             int num = historyPage.GetBookHistoryNum();
-            if( num > 0 && (num % 10) == 0 ) {
+            if( num > 0 && (num % 4) == 0 ) {
                 showReviewDialog();
             }
         }
@@ -188,30 +170,24 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                     .setTitle("履歴読み込み")
                     .setMessage("履歴書き出し内容を貼り付けましょう")
                     .setView(editText)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String history = editText.getText().toString();
-                            try {
-                                JSONArray jarray = new JSONArray(history);
-                                for (int i = jarray.length() - 1; i >= 0;  --i) {
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        String history1 = editText.getText().toString();
+                        try {
+                            JSONArray jarray = new JSONArray(history1);
+                            for (int i = jarray.length() - 1; i >= 0;  --i) {
 //                                  Log.d("AAA", jarray.getString(i));
-                                    JSONArray book = new JSONArray(jarray.getString(i));
+                                JSONArray book = new JSONArray(jarray.getString(i));
 //                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
-                                    historyPage.AddHistory(book.getString(0), book.getString(1));
-                                }
-                                showHistoryPage();
+                                historyPage.AddHistory(book.getString(0), book.getString(1));
                             }
-                            catch (org.json.JSONException e) {
+                            showHistoryPage();
+                        }
+                        catch (org.json.JSONException e) {
 
-                            }
                         }
                     })
-                    .setNegativeButton("キャンセル", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //処理なし
-                        }
+                    .setNegativeButton("キャンセル", (dialog, which) -> {
+                        //処理なし
                     })
                     .show();
                 break;
@@ -250,27 +226,21 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     }
 
     private void showHistoryPage() {
-        calilWebView.post(new Runnable() {
-            @Override
-            public void run() {
-                String htmlString = historyPage.GetWebPage();
-                String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
-                calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
-            }
+        calilWebView.post(() -> {
+            String htmlString = historyPage.GetWebPage();
+            String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
+            calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
         });
 
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
 
     private void showBooksImagePage() {
-        calilWebView.post(new Runnable() {
-            @Override
-            public void run() {
+        calilWebView.post(() -> {
 //                int width = calilWebView.getWidth();
-                String htmlString = historyPage.GetImagePage();
-                String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
-                calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
-            }
+            String htmlString = historyPage.GetImagePage();
+            String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
+            calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
         });
 
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
