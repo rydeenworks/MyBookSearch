@@ -1,7 +1,9 @@
-package com.rydeenworks.mybooksearch;
+package com.rydeenworks.mybooksearch.infrastructure;
 
 import android.os.Handler;
 import android.os.Looper;
+
+import com.rydeenworks.mybooksearch.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;

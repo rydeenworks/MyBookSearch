@@ -1,7 +1,5 @@
 package com.rydeenworks.mybooksearch;
 
-import static android.content.Intent.FLAG_ACTIVITY_REQUIRE_DEFAULT;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -15,20 +13,20 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.rydeenworks.mybooksearch.domain.Book;
+import com.rydeenworks.mybooksearch.infrastructure.AsyncHttpRequest;
+import com.rydeenworks.mybooksearch.usecase.ParseAmazonHtml;
+
 import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements BookLoadEventListener {
     private WebView calilWebView;
@@ -279,65 +277,20 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     }
 
     public Boolean OnLoadBookHttp(String httpSrc) {
-        String bookTitle = "";
-        {
-            final String TITLE_TAG_START = "<title>";
-            final String TITLE_TAG_END = "</title>";
-            final int idxStart = httpSrc.indexOf(TITLE_TAG_START);
-            final int idxEnd = httpSrc.indexOf(TITLE_TAG_END);
-
-            if(idxStart != -1 && idxEnd != -1)
-            {
-                bookTitle = httpSrc.substring(idxStart + TITLE_TAG_START.length(), idxEnd);
-                final int idxSeparator = bookTitle.indexOf("|");
-                if( idxSeparator != -1) {
-                    bookTitle = bookTitle.substring(0, idxSeparator);
-                }
-                bookTitle = bookTitle.trim();
-//        <title>忙しい人専用 「つくりおき食堂」の超簡単レシピ (扶桑社ムック) | 若菜 まりえ |本 | 通販 | Amazon</title>
-            }else{
-                final String BOOK_TITLE_TAG = "<h1 id=\"title\" class=\"a-size-medium\">";
-                final int idx = httpSrc.indexOf(BOOK_TITLE_TAG);
-                if(idx != -1)
-                {
-//                    Log.d("AAA", "</title> found at " + idx);
-                    final int idxLineEnd = httpSrc.indexOf("\n", idx);
-                    if(idxLineEnd != -1)
-                    {
-                        bookTitle = httpSrc.substring(idx + BOOK_TITLE_TAG.length(), idxLineEnd);
-//                        Log.d("AAA", httpSrc.substring(idx + BOOK_TITLE_TAG.length(), idxLineEnd));
-                    }
-                }
-            }
-        }
-
-        if(bookTitle.isEmpty())
+        ParseAmazonHtml amazonParser = new ParseAmazonHtml();
+        Book book = amazonParser.handle(httpSrc);
+        if(!book.isValid())
         {
             return false;
         }
 
-        final String ISBN13_TAG = "ISBN-13";
-        final int idx = httpSrc.indexOf(ISBN13_TAG);
-        if(idx == -1) {
-//            Log.d("AAA", "ISBN-13 not found");
-            return false;
-        }
-        String isbnHtml = httpSrc.substring(idx, idx+1000);  //100文字以内でマッチングできるはず
+        Uri uri = Uri.parse("https://calil.jp/book/" + book.getIsbn());
+        Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+        startActivity(intent);
 
-        Pattern p = Pattern.compile("[0-9]{3}-[0-9]{9}[0-9|X]");
-        Matcher m = p.matcher(isbnHtml);
-        if (m.find()){
-            String isbn = m.group();
-            Uri uri = Uri.parse("https://calil.jp/book/" + isbn);
-            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-            startActivity(intent);
-
-            historyPage.AddHistory(bookTitle, isbn);
-            showHistoryPage();
-            return true;
-        }else{
-            return false;
-        }
+        historyPage.AddHistory(book.getTitle(), book.getIsbn());
+        showHistoryPage();
+        return true;
     }
 
     public void NotifyBookSearchResul(Boolean success) {

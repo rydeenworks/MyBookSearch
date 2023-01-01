@@ -1,6 +1,5 @@
 package com.rydeenworks.mybooksearch.infrastructure
 
-import android.content.Context
 import android.content.SharedPreferences
 import org.json.JSONArray
 
@@ -72,7 +71,7 @@ class BookRepository (
     }
 
 
-    public fun isExistHistoryBookTitle(bookTitle: String): Boolean {
+    fun isExistHistoryBookTitle(bookTitle: String): Boolean {
         val historyList: ArrayList<JSONArray> = getHistoryList()
         try {
             for (jsonArray in historyList) {
