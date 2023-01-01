@@ -12,8 +12,6 @@ class BookRepository (
     fun addBook(bookTitle: String, isbn: String)
     {
         //登録済みの履歴は追加しない
-
-        //登録済みの履歴は追加しない
         if (isExistHistoryBookTitle(bookTitle)) {
             return
         }

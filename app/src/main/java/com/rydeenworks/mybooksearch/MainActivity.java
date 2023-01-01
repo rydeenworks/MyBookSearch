@@ -21,6 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.infrastructure.AsyncHttpRequest;
+import com.rydeenworks.mybooksearch.usecase.CreateBookImageWebPage;
+import com.rydeenworks.mybooksearch.usecase.CreateBookListWebPage;
 import com.rydeenworks.mybooksearch.usecase.CustomerStatusService;
 import com.rydeenworks.mybooksearch.usecase.ParseAmazonHtml;
 
@@ -227,7 +229,10 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
     private void showHistoryPage() {
         calilWebView.post(() -> {
-            String htmlString = historyPage.GetWebPage();
+            ArrayList<JSONArray> books =  historyPage.GetHistory();
+            CreateBookListWebPage createBookListWebPage = new CreateBookListWebPage();
+            String htmlString = createBookListWebPage.handle(books);
+
             String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
             calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
         });
@@ -237,8 +242,10 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
 
     private void showBooksImagePage() {
         calilWebView.post(() -> {
-//                int width = calilWebView.getWidth();
-            String htmlString = historyPage.GetImagePage();
+            ArrayList<JSONArray> books =  historyPage.GetHistory();
+            CreateBookImageWebPage createBookImageWebPage = new CreateBookImageWebPage();
+            String htmlString = createBookImageWebPage.handle(books);
+
             String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
             calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
         });
