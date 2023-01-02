@@ -19,24 +19,21 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloadEventListner;
-import com.rydeenworks.mybooksearch.usecase.BookLoadEventListener;
+import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
 import com.rydeenworks.mybooksearch.usecase.HistoryPage;
 import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.Book;
-import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloader;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
 import com.rydeenworks.mybooksearch.usecase.CustomerStatusService;
 import com.rydeenworks.mybooksearch.usecase.html.AmazonHtmlEventListner;
 import com.rydeenworks.mybooksearch.usecase.html.DownloadAmazonHtmlService;
-import com.rydeenworks.mybooksearch.usecase.html.ParseAmazonHtml;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements BookLoadEventListener, AmazonHtmlEventListner {
+        implements BookClickEventListener, AmazonHtmlEventListner {
     private WebViewAdapter webViewAdapter;
     private HistoryPage historyPage;
     private CustomerStatusService customerStatusService;
