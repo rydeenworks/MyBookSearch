@@ -1,9 +1,9 @@
-package com.rydeenworks.mybooksearch.usecase
+package com.rydeenworks.mybooksearch.usecase.webpage
 
-import org.json.JSONArray
+import com.rydeenworks.mybooksearch.domain.Book
 
 class CreateBookImageWebPage {
-    fun handle(historyList: ArrayList<JSONArray>): String {
+    fun handle(books: List<Book>): String {
         val htmlBuilder = StringBuilder()
         htmlBuilder.append("<html>")
         htmlBuilder.append("<head>")
@@ -19,14 +19,14 @@ class CreateBookImageWebPage {
         try {
             var count = 0
             val BOOK_NUM = 5
-            for (jsonArray in historyList) {
+            for (book in books) {
                 if (count == 0) {
                     htmlBuilder.append("<div style=\"text-align:center;\">")
                 }
                 htmlBuilder.append("<img src=\"")
-                val url = "https://cover.openbd.jp/" + jsonArray[1] + ".jpg\" "
+                val url = "https://cover.openbd.jp/" + book.isbn + ".jpg\" "
                 htmlBuilder.append(url)
-                htmlBuilder.append("alt=\"" + jsonArray[0] + "\" style=\"border:solid 1px #000000\"")
+                htmlBuilder.append("alt=\"" + book.title + "\" style=\"border:solid 1px #000000\"")
                 htmlBuilder.append(">")
                 count++
                 if (count == BOOK_NUM) {

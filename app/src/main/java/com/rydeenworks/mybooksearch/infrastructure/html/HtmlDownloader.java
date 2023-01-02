@@ -1,10 +1,7 @@
-package com.rydeenworks.mybooksearch.infrastructure;
+package com.rydeenworks.mybooksearch.infrastructure.html;
 
 import android.os.Handler;
 import android.os.Looper;
-
-import com.rydeenworks.mybooksearch.ui.MainActivity;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -13,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class AsyncHttpRequest{
+public class HtmlDownloader {
     private class AsyncRunnable implements Runnable {
 
         private Boolean result;
@@ -33,10 +30,11 @@ public class AsyncHttpRequest{
         }
     }
 
-    private MainActivity mActivity;
+    private HtmlDownloadEventListner _eventListner;
 
-    public AsyncHttpRequest(MainActivity activity) {
-        mActivity = activity;
+    public HtmlDownloader(HtmlDownloadEventListner eventListner)
+    {
+        _eventListner = eventListner;
     }
 
     public void execute(String url)
@@ -51,8 +49,8 @@ public class AsyncHttpRequest{
     protected Boolean doInBackground(String params) {
         for(int i=0; i<10; i++){ // 10回ほどリトライする
             String html = downloadHtml(params);
-            Boolean success = mActivity.OnLoadBookHttp(html);
-            if(success) {
+            Boolean successParse = _eventListner.OnDownloaded(html);
+            if(successParse) {
                 return true;
             }
         }
@@ -85,7 +83,13 @@ public class AsyncHttpRequest{
         return new String(src);
     }
 
-    public void onPostExecute(Boolean result) {
-        mActivity.NotifyBookSearchResul(result);
+    public void onPostExecute(Boolean result)
+    {
+        if(result)
+        {
+            _eventListner.OnSuccessDownload();
+        }else{
+            _eventListner.OnFailedDownload();
+        }
     }
 }

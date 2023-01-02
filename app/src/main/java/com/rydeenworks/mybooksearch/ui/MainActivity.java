@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -17,23 +19,28 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloadEventListner;
 import com.rydeenworks.mybooksearch.usecase.BookLoadEventListener;
 import com.rydeenworks.mybooksearch.usecase.HistoryPage;
 import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.Book;
-import com.rydeenworks.mybooksearch.infrastructure.AsyncHttpRequest;
+import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloader;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
 import com.rydeenworks.mybooksearch.usecase.CustomerStatusService;
-import com.rydeenworks.mybooksearch.usecase.ParseAmazonHtml;
+import com.rydeenworks.mybooksearch.usecase.html.AmazonHtmlEventListner;
+import com.rydeenworks.mybooksearch.usecase.html.DownloadAmazonHtmlService;
+import com.rydeenworks.mybooksearch.usecase.html.ParseAmazonHtml;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements BookLoadEventListener {
+public class MainActivity extends AppCompatActivity
+        implements BookLoadEventListener, AmazonHtmlEventListner {
     private WebViewAdapter webViewAdapter;
     private HistoryPage historyPage;
     private CustomerStatusService customerStatusService;
+    private DownloadAmazonHtmlService downloadAmazonHtmlService = new DownloadAmazonHtmlService(this);
 
     enum ViewMode{
         VIEW_MODE_HISTORY,
@@ -55,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                 context.getString(R.string.app_is_reviewd));
 
         initView();
-
         searchBookPage();
     }
 
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         Toast toast = Toast.makeText(this, "本を検索中・・・", Toast.LENGTH_LONG);
         toast.show();
 
-        new AsyncHttpRequest(this).execute(bookPageUrl);
+        downloadAmazonHtmlService.download(bookPageUrl);
     }
 
     @Override
@@ -233,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     private void showHistoryPage() {
         if(webViewAdapter != null)
         {
-            webViewAdapter.showBookHistoryPage(historyPage.GetHistoryText());
+            webViewAdapter.showBookHistoryPage(historyPage.GetHistory());
         }
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
@@ -241,33 +247,9 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     private void showBooksImagePage() {
         if(webViewAdapter != null)
         {
-            webViewAdapter.showBookImagePage(historyPage.GetHistoryText());
+            webViewAdapter.showBookImagePage(historyPage.GetHistory());
         }
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
-    }
-
-    public Boolean OnLoadBookHttp(String httpSrc) {
-        ParseAmazonHtml amazonParser = new ParseAmazonHtml();
-        Book book = amazonParser.handle(httpSrc);
-        if(!book.isValid())
-        {
-            return false;
-        }
-
-        Uri uri = Uri.parse("https://calil.jp/book/" + book.getIsbn());
-        Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-        startActivity(intent);
-
-        historyPage.AddHistory(book.getTitle(), book.getIsbn());
-        showHistoryPage();
-        return true;
-    }
-
-    public void NotifyBookSearchResul(Boolean success) {
-        if(!success) {
-            Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
-            toast.show();
-        }
     }
 
     public static void copyToClipboard(Context context, String label, String text) {
@@ -278,5 +260,27 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
             return;
         }
         clipboardManager.setPrimaryClip(ClipData.newPlainText(label, text));
+    }
+
+    @Override
+    public void OnFailedDownload() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
+            toast.show();
+        });
+    }
+
+    @Override
+    public void OnSuccessDownload(Book book) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            Uri uri = Uri.parse("https://calil.jp/book/" + book.getIsbn());
+            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+            startActivity(intent);
+
+            historyPage.AddHistory(book.getTitle(), book.getIsbn());
+            showHistoryPage();
+        });
     }
 }

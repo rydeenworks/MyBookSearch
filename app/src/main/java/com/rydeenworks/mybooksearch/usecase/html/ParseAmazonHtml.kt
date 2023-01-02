@@ -1,9 +1,9 @@
-package com.rydeenworks.mybooksearch.usecase
+package com.rydeenworks.mybooksearch.usecase.html
 
 import com.rydeenworks.mybooksearch.domain.Book
 import java.util.regex.Pattern
 
-class ParseAmazonHtml (){
+class ParseAmazonHtml {
     fun handle(httpSrc: String): Book
     {
         var bookTitle = ""

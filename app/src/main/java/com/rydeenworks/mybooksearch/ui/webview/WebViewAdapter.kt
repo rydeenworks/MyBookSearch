@@ -2,10 +2,10 @@ package com.rydeenworks.mybooksearch.ui.webview
 
 import android.util.Base64
 import android.webkit.WebView
+import com.rydeenworks.mybooksearch.domain.Book
 import com.rydeenworks.mybooksearch.usecase.BookLoadEventListener
-import com.rydeenworks.mybooksearch.usecase.CreateBookImageWebPage
-import com.rydeenworks.mybooksearch.usecase.CreateBookListWebPage
-import org.json.JSONArray
+import com.rydeenworks.mybooksearch.usecase.webpage.CreateBookImageWebPage
+import com.rydeenworks.mybooksearch.usecase.webpage.CreateBookListWebPage
 
 class WebViewAdapter (
     private val webView: WebView,
@@ -19,7 +19,7 @@ class WebViewAdapter (
         webView.setWebViewClient(webViewClient)
     }
 
-    fun showBookHistoryPage(books: ArrayList<JSONArray>)
+    fun showBookHistoryPage(books: List<Book>)
     {
         webView.post {
             val createBookListWebPage = CreateBookListWebPage()
@@ -33,7 +33,7 @@ class WebViewAdapter (
 
     }
 
-    fun showBookImagePage(books: ArrayList<JSONArray>)
+    fun showBookImagePage(books: List<Book>)
     {
         webView.post {
             val createBookImageWebPage = CreateBookImageWebPage()

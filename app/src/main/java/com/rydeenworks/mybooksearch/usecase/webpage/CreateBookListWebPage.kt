@@ -1,10 +1,10 @@
-package com.rydeenworks.mybooksearch.usecase
+package com.rydeenworks.mybooksearch.usecase.webpage
 
-import org.json.JSONArray
+import com.rydeenworks.mybooksearch.domain.Book
 
 class CreateBookListWebPage {
 
-    fun handle(historyList: ArrayList<JSONArray>): String {
+    fun handle(books: List<Book>): String {
         val htmlBuilder = StringBuilder()
         htmlBuilder.append("<html>")
         htmlBuilder.append("<head>")
@@ -23,18 +23,18 @@ class CreateBookListWebPage {
         htmlBuilder.append("</div>")
         try {
             htmlBuilder.append("<br>")
-            for (jsonArray in historyList) {
+            for (book in books) {
                 htmlBuilder.append("<img align=\"left\" src=\"")
-                val img_url = "https://cover.openbd.jp/" + jsonArray[1] + ".jpg\" "
+                val img_url = "https://cover.openbd.jp/" + book.isbn + ".jpg\" "
                 htmlBuilder.append(img_url)
-                htmlBuilder.append("alt=\"" + jsonArray[0] + "\" style=\"border:solid 1px #000000\"")
+                htmlBuilder.append("alt=\"" + book.title + "\" style=\"border:solid 1px #000000\"")
                 htmlBuilder.append(">")
                 htmlBuilder.append("<a href=\"")
                 val url =
-                    "https://www.amazon.co.jp/gp/search?ie=UTF8&tag=dynamitecruis-22&linkCode=ur2&linkId=4b1da2ab20d2fa32b9230f88ddab039e&camp=247&creative=1211&index=books&keywords=" + jsonArray[0]
+                    "https://www.amazon.co.jp/gp/search?ie=UTF8&tag=dynamitecruis-22&linkCode=ur2&linkId=4b1da2ab20d2fa32b9230f88ddab039e&camp=247&creative=1211&index=books&keywords=" + book.title
                 htmlBuilder.append(url)
                 htmlBuilder.append("\">")
-                htmlBuilder.append(jsonArray[0])
+                htmlBuilder.append(book.title)
                 htmlBuilder.append("</a>")
                 htmlBuilder.append("<br clear=\"left\"")
                 htmlBuilder.append("<hr>")
