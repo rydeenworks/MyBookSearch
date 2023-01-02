@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch;
+package com.rydeenworks.mybooksearch.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -19,10 +17,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rydeenworks.mybooksearch.usecase.BookLoadEventListener;
+import com.rydeenworks.mybooksearch.usecase.HistoryPage;
+import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.infrastructure.AsyncHttpRequest;
-import com.rydeenworks.mybooksearch.usecase.CreateBookImageWebPage;
-import com.rydeenworks.mybooksearch.usecase.CreateBookListWebPage;
+import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
 import com.rydeenworks.mybooksearch.usecase.CustomerStatusService;
 import com.rydeenworks.mybooksearch.usecase.ParseAmazonHtml;
 
@@ -31,8 +31,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements BookLoadEventListener {
-    private WebView calilWebView;
-    private final CalilWebViewClient calilWebViewClient = new CalilWebViewClient();
+    private WebViewAdapter webViewAdapter;
     private HistoryPage historyPage;
     private CustomerStatusService customerStatusService;
 
@@ -55,12 +54,8 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
                 sharedPref,
                 context.getString(R.string.app_is_reviewd));
 
+        initView();
 
-        setContentView(R.layout.activity_main);
-
-        setTitle("図書さがし");
-
-        initCalilWebView();
         searchBookPage();
     }
 
@@ -122,13 +117,33 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void initCalilWebView() {
-        if(calilWebView == null) {
-            calilWebView = findViewById(R.id.webView_calil);
-            calilWebView.setWebViewClient(calilWebViewClient);
-            calilWebViewClient.SetEventListener(this);
-            showHistoryPage();
+    private void initView() {
+        setContentView(R.layout.activity_main);
+        if(webViewAdapter == null)
+        {
+            WebView calilWebView = findViewById(R.id.webView_calil);
+            webViewAdapter = new WebViewAdapter(calilWebView, this);
         }
+
+//        setContentView(R.layout.book_search_history);
+
+//        // データを用意
+//        String[] data = {
+//                "とり", "しか", "ぞう", "きつね",
+//                "かば", "ライオン", "パンダ", "ひつじ"
+//        };
+//
+//        // ListViewにデータをセットする
+//        ListView list = findViewById(R.id.book_list);
+//        list.setAdapter(new ArrayAdapter<>(
+//                this,
+//                android.R.layout.simple_list_item_1,
+//                data
+//        ));
+
+        setTitle("図書さがし");
+
+        showHistoryPage();
     }
 
     @Override
@@ -156,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_export_history:
-                ArrayList<JSONArray> history = historyPage.GetHistory();
+                ArrayList<JSONArray> history = historyPage.GetHistoryText();
 
                 copyToClipboard(this, "図書さがし履歴", history.toString());
 
@@ -215,41 +230,19 @@ public class MainActivity extends AppCompatActivity implements BookLoadEventList
         return true;
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // 端末の戻るボタンでブラウザバック
-        if( keyCode == KeyEvent.KEYCODE_BACK ) {
-            WebView webView = calilWebView;
-            if (webView != null && webView.canGoBack()) {
-                webView.goBack();
-                return true;
-            }
-        }
-        return super.onKeyDown(keyCode,  event);
-    }
-
     private void showHistoryPage() {
-        calilWebView.post(() -> {
-            ArrayList<JSONArray> books =  historyPage.GetHistory();
-            CreateBookListWebPage createBookListWebPage = new CreateBookListWebPage();
-            String htmlString = createBookListWebPage.handle(books);
-
-            String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
-            calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
-        });
-
+        if(webViewAdapter != null)
+        {
+            webViewAdapter.showBookHistoryPage(historyPage.GetHistoryText());
+        }
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
 
     private void showBooksImagePage() {
-        calilWebView.post(() -> {
-            ArrayList<JSONArray> books =  historyPage.GetHistory();
-            CreateBookImageWebPage createBookImageWebPage = new CreateBookImageWebPage();
-            String htmlString = createBookImageWebPage.handle(books);
-
-            String encodedHtml = Base64.encodeToString(htmlString.getBytes(), Base64.DEFAULT);
-            calilWebView.loadData(encodedHtml, "text/html; charset=UTF-8", "base64");
-        });
-
+        if(webViewAdapter != null)
+        {
+            webViewAdapter.showBookImagePage(historyPage.GetHistoryText());
+        }
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
     }
 

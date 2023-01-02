@@ -1,10 +1,14 @@
-package com.rydeenworks.mybooksearch;
+package com.rydeenworks.mybooksearch.usecase;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.rydeenworks.mybooksearch.R;
+import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import org.json.JSONArray;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryPage {
     private final BookRepository bookRepository;
@@ -31,7 +35,11 @@ public class HistoryPage {
         bookRepository.addBook(bookTitle, isbn);
     }
 
-    public ArrayList<JSONArray> GetHistory() {
+    public ArrayList<JSONArray> GetHistoryText() {
+        return bookRepository.getHistoryText();
+    }
+
+    public List<Book> GetHistory() {
         return bookRepository.getHistoryList();
     }
 }

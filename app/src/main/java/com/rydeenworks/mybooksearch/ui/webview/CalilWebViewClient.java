@@ -1,7 +1,9 @@
-package com.rydeenworks.mybooksearch;
+package com.rydeenworks.mybooksearch.ui.webview;
 
 import android.net.Uri;
 import android.webkit.WebViewClient;
+
+import com.rydeenworks.mybooksearch.usecase.BookLoadEventListener;
 
 public class CalilWebViewClient extends WebViewClient {
     private BookLoadEventListener eventListener;

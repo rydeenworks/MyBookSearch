@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.rydeenworks.mybooksearch.MainActivity"
+    tools:context="com.rydeenworks.mybooksearch.ui.MainActivity"
     android:orientation="vertical">
 
     <WebView

@@ -3,7 +3,7 @@ package com.rydeenworks.mybooksearch.infrastructure;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.rydeenworks.mybooksearch.MainActivity;
+import com.rydeenworks.mybooksearch.ui.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;

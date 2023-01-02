@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="6dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/book_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        tools:src="@tools:sample/avatars"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="TODO" />
+
+    <TextView
+        android:id="@+id/book_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="動物名"
+        android:textSize="18sp"
+        android:layout_marginStart="6dp"
+        android:layout_marginLeft="6dp"
+        app:layout_constraintStart_toEndOf="@id/book_image"
+        app:layout_constraintTop_toTopOf="@id/book_image" />
+
+    <TextView
+        android:id="@+id/book_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="説明文を表示します。"
+        app:layout_constraintBottom_toBottomOf="@id/book_image"
+        app:layout_constraintStart_toStartOf="@id/book_title"
+        app:layout_constraintTop_toBottomOf="@id/book_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.rydeenworks.mybooksearch.infrastructure
 
 import android.content.SharedPreferences
+import com.rydeenworks.mybooksearch.domain.Book
 import org.json.JSONArray
 
 class BookRepository (
@@ -45,7 +46,7 @@ class BookRepository (
     }
 
 
-    fun getHistoryList(): java.util.ArrayList<JSONArray> {
+    fun getHistoryText(): java.util.ArrayList<JSONArray> {
         val historyList = java.util.ArrayList<JSONArray>()
         val lastIndex = getLastIndex()
         var currIndex = lastIndex
@@ -68,18 +69,20 @@ class BookRepository (
         return historyList
     }
 
+    fun getHistoryList(): List<Book> {
+        val historyList = getHistoryText()
+        val books = historyList.map { Book(it.get(0).toString(), it.get(1).toString()) }
+        return books
+    }
+
 
     fun isExistHistoryBookTitle(bookTitle: String): Boolean {
-        val historyList: ArrayList<JSONArray> = getHistoryList()
-        try {
-            for (jsonArray in historyList) {
-                if (bookTitle == jsonArray[0]) {
-                    return true
-                }
+        val books = getHistoryList()
+        for (book in books) {
+            if(book.title == bookTitle)
+            {
+                return true
             }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            return false
         }
         return false
     }

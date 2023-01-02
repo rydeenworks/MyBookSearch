@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch;
+package com.rydeenworks.mybooksearch.usecase;
 
 import android.net.Uri;
 
