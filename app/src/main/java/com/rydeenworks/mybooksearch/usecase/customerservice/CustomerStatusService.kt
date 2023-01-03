@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch.usecase
+package com.rydeenworks.mybooksearch.usecase.customerservice
 
 import android.content.SharedPreferences
 

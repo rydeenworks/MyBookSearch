@@ -20,13 +20,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
+import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog;
 import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
 import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
-import com.rydeenworks.mybooksearch.usecase.CustomerStatusService;
+import com.rydeenworks.mybooksearch.usecase.customerservice.CustomerStatusService;
 import com.rydeenworks.mybooksearch.usecase.html.AmazonHtmlEventListner;
 import com.rydeenworks.mybooksearch.usecase.html.DownloadAmazonHtmlService;
 
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity
         implements BookClickEventListener, AmazonHtmlEventListner {
     private BookRepository bookRepository;
     private IHistoryPage historyPage;
-    private CustomerStatusService customerStatusService;
+    private ReviewDialog reviewDialog;
     private DownloadAmazonHtmlService downloadAmazonHtmlService = new DownloadAmazonHtmlService(this);
 
     enum ViewMode{
@@ -54,39 +55,14 @@ public class MainActivity extends AppCompatActivity
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(
                 context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-        customerStatusService = new CustomerStatusService(
-                sharedPref,
-                context.getString(R.string.app_is_reviewd));
-
         String historyLastIndexKeyStr = getString(R.string.history_last_index_key);
         bookRepository = new BookRepository(
                 historyLastIndexKeyStr,
                 sharedPref);
+        reviewDialog = new ReviewDialog(this);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
 
         initView();
         searchBookPage();
-    }
-
-    private void showReviewDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("レビューにご協力お願いします")
-                .setMessage("いつもご利用ありがとうございます。よろしければ励ましのレビューをお寄せください")
-                .setPositiveButton("レビューする", (dialog, which) -> {
-                    customerStatusService.saveAppReviewFlag();
-
-                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch");
-                    Intent i = new Intent(Intent.ACTION_VIEW,uri);
-                    startActivity(i);
-                })
-                .setNeutralButton("その他要望", (dialog, which) -> {
-                    Uri uri = Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSegGYDdqtw9gq8xZSb4yqORgFE5A4uQzR0RBrFDtLfsIDfs3g/viewform?usp=sf_link");
-                    Intent i = new Intent(Intent.ACTION_VIEW,uri);
-                    startActivity(i);
-                })
-                .setNegativeButton("また今度", (dialog, which) -> {
-                    //処理なし
-                })
-                .show();
     }
 
     private void searchBookPage() {
@@ -94,23 +70,23 @@ public class MainActivity extends AppCompatActivity
         String action = intent.getAction();
         String type = intent.getType();
 
-        String bookPageUrl = null;
-        if (Intent.ACTION_SEND.equals(action) && type != null && "text/plain".equals(type)) {
-            bookPageUrl = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if(Intent.ACTION_SEND.equals(action) == false)
+        {
+            return;
         }
-
-        if (bookPageUrl == null) {
+        if(type == null)
+        {
+            return;
+        }
+        if("text/plain".equals(type) == false)
+        {
             return;
         }
 
-        if( !customerStatusService.isAppReviewed())
-        {
-            // 4冊検索するごとに表示する
-            int num = bookRepository.getBookNum();
-            if( num > 0 && (num % 4) == 0 ) {
-                showReviewDialog();
-            }
-        }
+        String bookPageUrl = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+        int num = bookRepository.getBookNum();
+        reviewDialog.showDialog(num);
 
         Toast toast = Toast.makeText(this, "本を検索中・・・", Toast.LENGTH_LONG);
         toast.show();
@@ -233,7 +209,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(i);
                 break;
             case R.id.menu_app_review:
-                showReviewDialog();
+                reviewDialog.showDialog();
                 break;
         }
         return true;
