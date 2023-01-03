@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -19,28 +17,27 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rydeenworks.mybooksearch.R;
+import com.rydeenworks.mybooksearch.domain.BookRepositoryEventListner;
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog;
 import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
-import com.rydeenworks.mybooksearch.R;
-import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
-import com.rydeenworks.mybooksearch.usecase.customerservice.CustomerStatusService;
-import com.rydeenworks.mybooksearch.usecase.html.AmazonHtmlEventListner;
-import com.rydeenworks.mybooksearch.usecase.html.DownloadAmazonHtmlService;
+import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
 
 import org.json.JSONArray;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements BookClickEventListener, AmazonHtmlEventListner {
+        implements BookClickEventListener,
+        BookRepositoryEventListner
+{
     private BookRepository bookRepository;
     private IHistoryPage historyPage;
     private ReviewDialog reviewDialog;
-    private DownloadAmazonHtmlService downloadAmazonHtmlService = new DownloadAmazonHtmlService(this);
 
     enum ViewMode{
         VIEW_MODE_HISTORY,
@@ -58,7 +55,8 @@ public class MainActivity extends AppCompatActivity
         String historyLastIndexKeyStr = getString(R.string.history_last_index_key);
         bookRepository = new BookRepository(
                 historyLastIndexKeyStr,
-                sharedPref);
+                sharedPref,
+                this);
         reviewDialog = new ReviewDialog(this);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
 
         initView();
@@ -66,33 +64,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void searchBookPage() {
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-
-        if(Intent.ACTION_SEND.equals(action) == false)
+        SearchBookInLibrary searchBookInLibrary = new SearchBookInLibrary(this, bookRepository);
+        if(searchBookInLibrary.handle())
         {
-            return;
+            int num = bookRepository.getBookNum();
+            reviewDialog.showDialog(num);
         }
-        if(type == null)
-        {
-            return;
-        }
-        if("text/plain".equals(type) == false)
-        {
-            return;
-        }
-
-        String bookPageUrl = intent.getStringExtra(Intent.EXTRA_TEXT);
-
-        int num = bookRepository.getBookNum();
-        reviewDialog.showDialog(num);
-
-        Toast toast = Toast.makeText(this, "本を検索中・・・", Toast.LENGTH_LONG);
-        toast.show();
-
-        downloadAmazonHtmlService.download(bookPageUrl);
-    }
+   }
 
     @Override
     protected void onStart() {
@@ -182,7 +160,7 @@ public class MainActivity extends AppCompatActivity
 //                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
                                 bookRepository.addBook(book.getString(0), book.getString(1));
                             }
-                            showHistoryPage();
+//                            showHistoryPage();
                         }
                         catch (org.json.JSONException e) {
 
@@ -236,24 +214,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void OnFailedDownload() {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-            Toast toast = Toast.makeText(this, "このページは検索できませんでした", Toast.LENGTH_LONG);
-            toast.show();
-        });
-    }
-
-    @Override
-    public void OnSuccessDownload(Book book) {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-            Uri uri = Uri.parse("https://calil.jp/book/" + book.getIsbn());
-            Intent intent = new Intent(Intent.ACTION_VIEW,uri);
-            startActivity(intent);
-
-            bookRepository.addBook(book.getTitle(), book.getIsbn());
-            showHistoryPage();
-        });
+    public void onUpdateBookRepository() {
+        showHistoryPage();
     }
 }

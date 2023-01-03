@@ -2,11 +2,13 @@ package com.rydeenworks.mybooksearch.infrastructure
 
 import android.content.SharedPreferences
 import com.rydeenworks.mybooksearch.domain.Book
+import com.rydeenworks.mybooksearch.domain.BookRepositoryEventListner
 import org.json.JSONArray
 
 class BookRepository (
     private val historyLastIndexKeyStr: String,
-    private val sharedPrefBooks: SharedPreferences
+    private val sharedPrefBooks: SharedPreferences,
+    private val bookRepositoryEventListner: BookRepositoryEventListner
 ){
     private val HISTORY_MAX_NUM = 100
 
@@ -21,6 +23,8 @@ class BookRepository (
         lastIndex = incrementLastIndex(lastIndex)
         saveHistory(lastIndex, bookTitle, isbn)
         saveLastIndex(lastIndex)
+
+        bookRepositoryEventListner.onUpdateBookRepository()
     }
     fun getBookNum() : Int
     {
