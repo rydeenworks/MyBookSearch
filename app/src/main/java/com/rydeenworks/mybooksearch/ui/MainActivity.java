@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
+import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
 import com.rydeenworks.mybooksearch.usecase.HistoryPage;
 import com.rydeenworks.mybooksearch.R;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements BookClickEventListener, AmazonHtmlEventListner {
-    private WebViewAdapter webViewAdapter;
+    private IHistoryPage iHistoryPage;
     private HistoryPage historyPage;
     private CustomerStatusService customerStatusService;
     private DownloadAmazonHtmlService downloadAmazonHtmlService = new DownloadAmazonHtmlService(this);
@@ -122,10 +124,12 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("ClickableViewAccessibility")
     private void initView() {
         setContentView(R.layout.activity_main);
-        if(webViewAdapter == null)
+
+        if(iHistoryPage == null)
         {
             WebView calilWebView = findViewById(R.id.webView_calil);
-            webViewAdapter = new WebViewAdapter(calilWebView, this);
+            WebViewAdapter webViewAdapter = new WebViewAdapter(calilWebView, this);
+            iHistoryPage = new HistoryPageWebView(webViewAdapter);
         }
 
 //        setContentView(R.layout.book_search_history);
@@ -234,18 +238,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showHistoryPage() {
-        if(webViewAdapter != null)
-        {
-            webViewAdapter.showBookHistoryPage(historyPage.GetHistory());
-        }
+        iHistoryPage.showBookList(historyPage.GetHistory());
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
 
     private void showBooksImagePage() {
-        if(webViewAdapter != null)
-        {
-            webViewAdapter.showBookImagePage(historyPage.GetHistory());
-        }
+        iHistoryPage.showBookImage(historyPage.GetHistory());
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
     }
 
