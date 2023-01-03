@@ -25,6 +25,8 @@ import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
+import com.rydeenworks.mybooksearch.usecase.book.ExportBookList;
+import com.rydeenworks.mybooksearch.usecase.book.ImportBookList;
 import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
 
 import org.json.JSONArray;
@@ -134,42 +136,12 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_export_history:
-                ArrayList<JSONArray> history = bookRepository.getHistoryText();
-
-                copyToClipboard(this, "図書さがし履歴", history.toString());
-
-                Toast toast = Toast.makeText(this, "履歴をクリップボードにコピーしました", Toast.LENGTH_LONG);
-                toast.show();
-
+                ExportBookList exportBookList = new ExportBookList(this, bookRepository);
+                exportBookList.handle();
                 break;
             case R.id.menu_import_history:
-                final EditText editText = new EditText(this);
-                editText.setHint("ここへ書き出し内容を貼り付け");
-                editText.setHeight(400);
-                new AlertDialog.Builder(this)
-                    .setTitle("履歴読み込み")
-                    .setMessage("履歴書き出し内容を貼り付けましょう")
-                    .setView(editText)
-                    .setPositiveButton("OK", (dialog, which) -> {
-                        String history1 = editText.getText().toString();
-                        try {
-                            JSONArray jarray = new JSONArray(history1);
-                            for (int i = jarray.length() - 1; i >= 0;  --i) {
-//                                  Log.d("AAA", jarray.getString(i));
-                                JSONArray book = new JSONArray(jarray.getString(i));
-//                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
-                                bookRepository.addBook(book.getString(0), book.getString(1));
-                            }
-//                            showHistoryPage();
-                        }
-                        catch (org.json.JSONException e) {
-
-                        }
-                    })
-                    .setNegativeButton("キャンセル", (dialog, which) -> {
-                        //処理なし
-                    })
-                    .show();
+                ImportBookList importBookList = new ImportBookList(this, bookRepository);
+                importBookList.handle();
                 break;
             case R.id.print_books_image:
                 switch (mViewMode) {
