@@ -19,10 +19,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
-import com.rydeenworks.mybooksearch.usecase.HistoryPage;
 import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.Book;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
@@ -36,8 +36,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements BookClickEventListener, AmazonHtmlEventListner {
-    private IHistoryPage iHistoryPage;
-    private HistoryPage historyPage;
+    private BookRepository bookRepository;
+    private IHistoryPage historyPage;
     private CustomerStatusService customerStatusService;
     private DownloadAmazonHtmlService downloadAmazonHtmlService = new DownloadAmazonHtmlService(this);
 
@@ -51,14 +51,17 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        historyPage = new HistoryPage(this);
-
         Context context = getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(
                 context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
         customerStatusService = new CustomerStatusService(
                 sharedPref,
                 context.getString(R.string.app_is_reviewd));
+
+        String historyLastIndexKeyStr = getString(R.string.history_last_index_key);
+        bookRepository = new BookRepository(
+                historyLastIndexKeyStr,
+                sharedPref);
 
         initView();
         searchBookPage();
@@ -84,7 +87,6 @@ public class MainActivity extends AppCompatActivity
                     //処理なし
                 })
                 .show();
-
     }
 
     private void searchBookPage() {
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity
         if( !customerStatusService.isAppReviewed())
         {
             // 4冊検索するごとに表示する
-            int num = historyPage.GetBookHistoryNum();
+            int num = bookRepository.getBookNum();
             if( num > 0 && (num % 4) == 0 ) {
                 showReviewDialog();
             }
@@ -125,11 +127,11 @@ public class MainActivity extends AppCompatActivity
     private void initView() {
         setContentView(R.layout.activity_main);
 
-        if(iHistoryPage == null)
+        if(historyPage == null)
         {
             WebView calilWebView = findViewById(R.id.webView_calil);
             WebViewAdapter webViewAdapter = new WebViewAdapter(calilWebView, this);
-            iHistoryPage = new HistoryPageWebView(webViewAdapter);
+            historyPage = new HistoryPageWebView(webViewAdapter);
         }
 
 //        setContentView(R.layout.book_search_history);
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_export_history:
-                ArrayList<JSONArray> history = historyPage.GetHistoryText();
+                ArrayList<JSONArray> history = bookRepository.getHistoryText();
 
                 copyToClipboard(this, "図書さがし履歴", history.toString());
 
@@ -202,7 +204,7 @@ public class MainActivity extends AppCompatActivity
 //                                  Log.d("AAA", jarray.getString(i));
                                 JSONArray book = new JSONArray(jarray.getString(i));
 //                                  Log.d("AAA", String.format("title:%s isbn:%s", book.getString(0), book.getString(1)));
-                                historyPage.AddHistory(book.getString(0), book.getString(1));
+                                bookRepository.addBook(book.getString(0), book.getString(1));
                             }
                             showHistoryPage();
                         }
@@ -238,12 +240,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showHistoryPage() {
-        iHistoryPage.showBookList(historyPage.GetHistory());
+        historyPage.showBookList(bookRepository.getHistoryList());
         mViewMode = ViewMode.VIEW_MODE_HISTORY;
     }
 
     private void showBooksImagePage() {
-        iHistoryPage.showBookImage(historyPage.GetHistory());
+        historyPage.showBookImage(bookRepository.getHistoryList());
         mViewMode = ViewMode.VIEW_MODE_IMAGE;
     }
 
@@ -274,7 +276,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(Intent.ACTION_VIEW,uri);
             startActivity(intent);
 
-            historyPage.AddHistory(book.getTitle(), book.getIsbn());
+            bookRepository.addBook(book.getTitle(), book.getIsbn());
             showHistoryPage();
         });
     }
