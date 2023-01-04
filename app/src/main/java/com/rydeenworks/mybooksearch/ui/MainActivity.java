@@ -1,7 +1,5 @@
 package com.rydeenworks.mybooksearch.ui;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -12,7 +10,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,10 +25,7 @@ import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
 import com.rydeenworks.mybooksearch.usecase.book.ExportBookList;
 import com.rydeenworks.mybooksearch.usecase.book.ImportBookList;
 import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
-
-import org.json.JSONArray;
-
-import java.util.ArrayList;
+import com.rydeenworks.mybooksearch.usecase.book.ShowHelpPage;
 
 public class MainActivity extends AppCompatActivity
         implements BookClickEventListener,
@@ -79,7 +73,6 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private void initView() {
         setContentView(R.layout.activity_main);
 
@@ -154,9 +147,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case R.id.menu_show_help_page:
-                Uri uri = Uri.parse("https://rydeenworks.hatenablog.com/entry/2019/09/12/214733");
-                Intent i = new Intent(Intent.ACTION_VIEW,uri);
-                startActivity(i);
+                ShowHelpPage showHelpPage = new ShowHelpPage(this);
+                showHelpPage.handle();
                 break;
             case R.id.menu_app_review:
                 reviewDialog.showDialog();
