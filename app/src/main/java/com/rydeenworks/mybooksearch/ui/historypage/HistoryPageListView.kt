@@ -2,7 +2,6 @@ package com.rydeenworks.mybooksearch.ui.historypage
 
 import android.app.Activity
 import android.net.Uri
-import android.widget.ArrayAdapter
 import android.widget.ListView
 import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
@@ -14,6 +13,9 @@ class HistoryPageListView(
     private val activity: Activity,
 ) : IHistoryPage, BookClickEventListener
 {
+    lateinit var historyListAdapter: HistoryListAdapter
+    lateinit var historyItems: List<HistoryListItem>
+
     init {
         activity.setContentView(R.layout.activity_main)
         activity.title = "図書さがし"
@@ -22,18 +24,18 @@ class HistoryPageListView(
 
     override fun updateView() {
         val books = bookRepository.getHistoryList()
-//        when (viewMode) {
-//            HistoryPageWebView.ViewStyle.VIEW_STYLE_HISTORY -> webViewAdapter.showBookHistoryPage(books)
-//            HistoryPageWebView.ViewStyle.VIEW_STYLE_IMAGE -> webViewAdapter.showBookImagePage(books)
-//        }
 
-        var bookTitles = books.map { it.title }
-        // ListViewにデータをセットする
-        val list: ListView = activity.findViewById(R.id.book_list);
-        list.adapter = ArrayAdapter(
-            activity,
-            android.R.layout.simple_list_item_1,
-            bookTitles)
+        val listView: ListView = activity.findViewById(R.id.book_list)
+
+        historyItems = books.map {
+            HistoryListItem(
+                it.title,
+                "https://cover.openbd.jp/" + it.isbn + ".jpg",
+                "https://www.amazon.co.jp/gp/search?ie=UTF8&tag=dynamitecruis-22&linkCode=ur2&linkId=4b1da2ab20d2fa32b9230f88ddab039e&camp=247&creative=1211&index=books&keywords=" + it.title)
+        }
+
+        historyListAdapter = HistoryListAdapter(activity, historyItems)
+        listView.adapter = historyListAdapter
     }
 
     override fun togglePageStyle() {
