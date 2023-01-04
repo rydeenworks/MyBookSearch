@@ -1,16 +1,12 @@
 package com.rydeenworks.mybooksearch.ui;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +19,7 @@ import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
 import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
 import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
+import com.rydeenworks.mybooksearch.usecase.browser.OpenChromeBrowser;
 
 public class MainActivity extends AppCompatActivity
         implements BookClickEventListener,
@@ -101,18 +98,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void OnLinkClick(Uri uri) {
-        try {
-            Intent i = new Intent();
-            i.setPackage("com.android.chrome");
-            i.setAction(Intent.ACTION_VIEW);
-            i.setData(uri);
-            startActivity(i);
-        }
-        catch (Exception e)
-        {
-            Toast toast = Toast.makeText(this, "ブラウザ起動に失敗しました", Toast.LENGTH_LONG);
-            toast.show();
-        }
+        OpenChromeBrowser openChromeBrowser = new OpenChromeBrowser(this);
+        openChromeBrowser.handle(uri);
     }
 
     @Override
