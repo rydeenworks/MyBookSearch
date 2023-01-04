@@ -2,11 +2,9 @@ package com.rydeenworks.mybooksearch.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,14 +14,10 @@ import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog;
 import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
-import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener;
-import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter;
 import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
-import com.rydeenworks.mybooksearch.usecase.browser.OpenChromeBrowser;
 
 public class MainActivity extends AppCompatActivity
-        implements BookClickEventListener,
-        BookRepositoryEventListner
+        implements BookRepositoryEventListner
 {
     private BookRepository bookRepository;
     private IHistoryPage historyPage;
@@ -63,14 +57,7 @@ public class MainActivity extends AppCompatActivity
                 this);
         reviewDialog = new ReviewDialog(this);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
 
-        setContentView(R.layout.activity_main);
-
-        if(historyPage == null)
-        {
-            WebView calilWebView = findViewById(R.id.webView_calil);
-            WebViewAdapter webViewAdapter = new WebViewAdapter(calilWebView, this);
-            historyPage = new HistoryPageWebView(webViewAdapter, bookRepository);
-        }
+        historyPage = new HistoryPageWebView(bookRepository, this);
 
         appMenu = new AppMenu(this, historyPage, bookRepository, reviewDialog);
 
@@ -91,15 +78,7 @@ public class MainActivity extends AppCompatActivity
 //                data
 //        ));
 
-        setTitle("図書さがし");
-
         historyPage.updateView();
-    }
-
-    @Override
-    public void OnLinkClick(Uri uri) {
-        OpenChromeBrowser openChromeBrowser = new OpenChromeBrowser(this);
-        openChromeBrowser.handle(uri);
     }
 
     @Override
