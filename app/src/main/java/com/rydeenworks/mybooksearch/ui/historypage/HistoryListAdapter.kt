@@ -21,7 +21,7 @@ class HistoryListAdapter(
         position: Int,
         convertView: View?,
         parent: ViewGroup): View {
-        val hitoryItem = historyItems[position]
+        val historyItem = historyItems[position]
 
         // レイアウトの設定
         var view = convertView
@@ -34,14 +34,14 @@ class HistoryListAdapter(
         if(imageView != null)
         {
             val setBookImageView = SetBookImageView(imageView)
-            setBookImageView.execute(hitoryItem.imageUrl)
+            setBookImageView.handle(historyItem.imageUrl)
         }
 
         val name = view?.findViewById<TextView>(R.id.book_title)
-        name?.text = hitoryItem.title
+        name?.text = historyItem.title
 
         val age = view?.findViewById<TextView>(R.id.book_detail)
-        age?.text = hitoryItem.amazonUrl
+        age?.text = historyItem.amazonUrl
 
         return view!!
     }
