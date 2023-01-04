@@ -12,6 +12,7 @@ import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.BookRepositoryEventListner;
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog;
+import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageListView;
 import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
 import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
@@ -57,26 +58,10 @@ public class MainActivity extends AppCompatActivity
                 this);
         reviewDialog = new ReviewDialog(this);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
 
-        historyPage = new HistoryPageWebView(bookRepository, this);
+//        historyPage = new HistoryPageWebView(bookRepository, this);
+        historyPage = new HistoryPageListView(bookRepository, this);
 
         appMenu = new AppMenu(this, historyPage, bookRepository, reviewDialog);
-
-
-//        setContentView(R.layout.book_search_history);
-
-//        // データを用意
-//        String[] data = {
-//                "とり", "しか", "ぞう", "きつね",
-//                "かば", "ライオン", "パンダ", "ひつじ"
-//        };
-//
-//        // ListViewにデータをセットする
-//        ListView list = findViewById(R.id.book_list);
-//        list.setAdapter(new ArrayAdapter<>(
-//                this,
-//                android.R.layout.simple_list_item_1,
-//                data
-//        ));
 
         historyPage.updateView();
     }
