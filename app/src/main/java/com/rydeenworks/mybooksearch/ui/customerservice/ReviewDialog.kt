@@ -1,5 +1,6 @@
 package com.rydeenworks.mybooksearch.ui.customerservice
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -9,24 +10,24 @@ import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.usecase.customerservice.CustomerStatusService
 
 class ReviewDialog (
-    private val context: Context
+    private val activity: Activity
         ){
 
     private val customerStatusService: CustomerStatusService
 
     init {
-        val sharedPref = context.getSharedPreferences(
-            context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE
+        val sharedPref = activity.getSharedPreferences(
+            activity.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE
         )
         customerStatusService = CustomerStatusService(
             sharedPref,
-            context.getString(R.string.app_is_reviewd)
+            activity.getString(R.string.app_is_reviewd)
         )
 
     }
 
     fun showDialog() {
-        AlertDialog.Builder(context)
+        AlertDialog.Builder(activity)
             .setTitle("レビューにご協力お願いします")
             .setMessage("いつもご利用ありがとうございます。よろしければ励ましのレビューをお寄せください")
             .setPositiveButton("レビューする") { dialog: DialogInterface?, which: Int ->
@@ -34,13 +35,13 @@ class ReviewDialog (
                 val uri =
                     Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch")
                 val i = Intent(Intent.ACTION_VIEW, uri)
-                context.startActivity(i)
+                activity.startActivity(i)
             }
             .setNeutralButton("その他要望") { dialog: DialogInterface?, which: Int ->
                 val uri =
                     Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSegGYDdqtw9gq8xZSb4yqORgFE5A4uQzR0RBrFDtLfsIDfs3g/viewform?usp=sf_link")
                 val i = Intent(Intent.ACTION_VIEW, uri)
-                context.startActivity(i)
+                activity.startActivity(i)
             }
             .setNegativeButton("また今度") { dialog: DialogInterface?, which: Int -> }
             .show()
