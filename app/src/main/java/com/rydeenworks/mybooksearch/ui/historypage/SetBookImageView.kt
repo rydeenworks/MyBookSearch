@@ -3,6 +3,7 @@ package com.rydeenworks.mybooksearch.ui.historypage
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
+import com.rydeenworks.mybooksearch.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -18,17 +19,22 @@ class SetBookImageView(
     fun handle(url: String)
     {
         GlobalScope.launch {
-            val image: Bitmap
-//        val defaultImage = BitmapFactory.decodeStream(resources.assets.open("image/image.png"))
             try {
                 val imageUrl = URL(url)
-                val imageIs: InputStream = imageUrl.openStream()
-                image = BitmapFactory.decodeStream(imageIs)
+                val imageIs = imageUrl.openStream()
+                val image = BitmapFactory.decodeStream(imageIs)
                 withContext(Dispatchers.Main) {
-                    imageView.setImageBitmap(image)
+                    if(image == null)
+                    {
+                        imageView.setImageResource(R.drawable.noimage128x128)
+                    } else {
+                        imageView.setImageBitmap(image)
+                    }
                 }
             }  catch (e: IOException) {
-                //画像が取れない時用
+                withContext(Dispatchers.Main) {
+                    imageView.setImageResource(R.drawable.noimage128x128)
+                }
             }
         }
     }
