@@ -1,6 +1,5 @@
 package com.rydeenworks.mybooksearch.ui.historypage
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
 import com.rydeenworks.mybooksearch.R
@@ -9,7 +8,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.io.InputStream
 import java.net.URL
 
 class SetBookImageView(
