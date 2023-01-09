@@ -38,6 +38,7 @@ class HistoryPageListView(
 
         historyListAdapter = HistoryListAdapter(activity, historyItems)
         listView.adapter = historyListAdapter
+        listView.onItemClickListener = this
     }
 
     override fun togglePageStyle() {
