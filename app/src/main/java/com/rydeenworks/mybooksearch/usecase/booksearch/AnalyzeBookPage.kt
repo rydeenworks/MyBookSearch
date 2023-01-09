@@ -1,17 +1,17 @@
-package com.rydeenworks.mybooksearch.usecase.html
+package com.rydeenworks.mybooksearch.usecase.booksearch
 
 import com.rydeenworks.mybooksearch.domain.Book
 import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloadEventListner
 import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloader
 import com.rydeenworks.mybooksearch.infrastructure.html.amazon.ParseAmazonHtml
 
-class DownloadAmazonHtmlService(
-    private val amazonHtmlEventListner: AmazonHtmlEventListner
+class AnalyzeBookPage(
+    private val analyzeBookPageEventListner: AnalyzeBookPageEventListner
 ) : HtmlDownloadEventListner {
 
     lateinit var book: Book
 
-    fun download(url: String)
+    fun handle(url: String)
     {
         HtmlDownloader(this).execute(url)
     }
@@ -26,10 +26,10 @@ class DownloadAmazonHtmlService(
     }
 
     override fun OnFailedDownload() {
-        amazonHtmlEventListner.OnFailedDownload()
+        analyzeBookPageEventListner.OnFailedAnalyzingBookPage()
     }
 
     override fun OnSuccessDownload() {
-        amazonHtmlEventListner.OnSuccessDownload(book)
+        analyzeBookPageEventListner.OnSuccessAnalyzingBookPage(book)
     }
 }

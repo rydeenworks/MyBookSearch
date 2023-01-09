@@ -2,39 +2,21 @@ package com.rydeenworks.mybooksearch.usecase.booksearch
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import com.rydeenworks.mybooksearch.domain.Book
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
-import com.rydeenworks.mybooksearch.usecase.html.AmazonHtmlEventListner
-import com.rydeenworks.mybooksearch.usecase.html.DownloadAmazonHtmlService
 
 class SearchBookInLibrary(
     private val activity: Activity,
     private val bookRepository: BookRepository
-): AmazonHtmlEventListner {
-    private val downloadAmazonHtmlService = DownloadAmazonHtmlService(this)
-
+): AnalyzeBookPageEventListner {
+    private val analyzeBookPage = AnalyzeBookPage(this)
 
     fun handle(): Boolean
     {
-        val intent: Intent = activity.getIntent()
-        val action = intent.action
-        val type = intent.type
-
-        if (Intent.ACTION_SEND != action) {
-            return false
-        }
-        if (type == null) {
-            return false
-        }
-        if ("text/plain" != type) {
-            return false
-        }
-
-        val bookPageUrl = intent.getStringExtra(Intent.EXTRA_TEXT)
+        val bookPageUrl = getBookPageUrl()
         if(bookPageUrl.isNullOrEmpty())
         {
             return false
@@ -43,11 +25,11 @@ class SearchBookInLibrary(
         val toast: Toast = Toast.makeText(activity, "本を検索中・・・", Toast.LENGTH_LONG)
         toast.show()
 
-        downloadAmazonHtmlService.download(bookPageUrl)
+        analyzeBookPage.handle(bookPageUrl)
         return true
     }
 
-    override fun OnFailedDownload() {
+    override fun OnFailedAnalyzingBookPage() {
         val handler = Handler(Looper.getMainLooper())
         handler.post {
             val toast: Toast = Toast.makeText(activity, "このページは検索できませんでした", Toast.LENGTH_LONG)
@@ -55,13 +37,27 @@ class SearchBookInLibrary(
         }
     }
 
-    override fun OnSuccessDownload(book: Book) {
-        val handler = Handler(Looper.getMainLooper())
-        handler.post {
-            val uri = Uri.parse("https://calil.jp/book/" + book.isbn)
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            activity.startActivity(intent)
-            bookRepository.addBook(book.title, book.isbn)
+    override fun OnSuccessAnalyzingBookPage(book: Book) {
+        val requestBookSearch = RequestBookSearch()
+        requestBookSearch.handle(book, activity)
+        bookRepository.addBook(book.title, book.isbn)
+    }
+
+    private fun getBookPageUrl(): String? {
+        val intent: Intent = activity.intent
+        val action = intent.action
+        val type = intent.type
+
+        if (Intent.ACTION_SEND != action) {
+            return null
         }
+        if (type == null) {
+            return null
+        }
+        if ("text/plain" != type) {
+            return null
+        }
+
+        return intent.getStringExtra(Intent.EXTRA_TEXT)
     }
 }
