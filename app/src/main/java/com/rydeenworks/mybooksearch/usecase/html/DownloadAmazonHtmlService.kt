@@ -3,6 +3,7 @@ package com.rydeenworks.mybooksearch.usecase.html
 import com.rydeenworks.mybooksearch.domain.Book
 import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloadEventListner
 import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloader
+import com.rydeenworks.mybooksearch.infrastructure.html.amazon.ParseAmazonHtml
 
 class DownloadAmazonHtmlService(
     private val amazonHtmlEventListner: AmazonHtmlEventListner

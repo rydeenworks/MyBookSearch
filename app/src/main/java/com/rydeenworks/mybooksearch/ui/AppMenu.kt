@@ -7,8 +7,8 @@ import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage
-import com.rydeenworks.mybooksearch.usecase.book.ExportBookList
-import com.rydeenworks.mybooksearch.usecase.book.ImportBookList
+import com.rydeenworks.mybooksearch.usecase.bookbackup.ExportBookList
+import com.rydeenworks.mybooksearch.usecase.bookbackup.ImportBookList
 import com.rydeenworks.mybooksearch.usecase.customerservice.ShowHelpPage
 
 class AppMenu(

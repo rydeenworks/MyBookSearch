@@ -1,20 +1,22 @@
-package com.rydeenworks.mybooksearch.ui.historypage
+package com.rydeenworks.mybooksearch.ui.historypage.listview
 
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.rydeenworks.mybooksearch.R
+import com.rydeenworks.mybooksearch.infrastructure.browser.OpenChromeBrowser
 
 class HistoryListAdapter(
     context: Context,
     private val historyItems: List<HistoryListItem>
 ): ArrayAdapter<HistoryListItem>(context, 0, historyItems)
 {
-
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(

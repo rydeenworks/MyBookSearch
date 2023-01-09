@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch.ui.historypage
+package com.rydeenworks.mybooksearch.ui.historypage.listview
 
 data class HistoryListItem (
     val title: String,

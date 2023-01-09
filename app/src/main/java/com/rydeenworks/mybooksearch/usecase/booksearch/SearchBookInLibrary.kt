@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch.usecase.book
+package com.rydeenworks.mybooksearch.usecase.booksearch
 
 import android.app.Activity
 import android.content.Intent

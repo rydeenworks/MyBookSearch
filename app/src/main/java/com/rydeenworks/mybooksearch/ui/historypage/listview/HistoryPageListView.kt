@@ -1,17 +1,19 @@
-package com.rydeenworks.mybooksearch.ui.historypage
+package com.rydeenworks.mybooksearch.ui.historypage.listview
 
 import android.app.Activity
 import android.net.Uri
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ListView
 import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
-import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener
-import com.rydeenworks.mybooksearch.usecase.browser.OpenChromeBrowser
+import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage
+import com.rydeenworks.mybooksearch.infrastructure.browser.OpenChromeBrowser
 
 class HistoryPageListView(
     private val bookRepository: BookRepository,
     private val activity: Activity,
-) : IHistoryPage, BookClickEventListener
+) : IHistoryPage, AdapterView.OnItemClickListener
 {
     lateinit var historyListAdapter: HistoryListAdapter
     lateinit var historyItems: List<HistoryListItem>
@@ -46,9 +48,10 @@ class HistoryPageListView(
         updateView()
     }
 
-
-    override fun OnLinkClick(uri: Uri) {
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val historyItem = historyItems[position]
         val openChromeBrowser = OpenChromeBrowser(activity)
+        val uri = Uri.parse(historyItem.amazonUrl)
         openChromeBrowser.handle(uri)
     }
 }

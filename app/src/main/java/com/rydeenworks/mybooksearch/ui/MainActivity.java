@@ -12,10 +12,9 @@ import com.rydeenworks.mybooksearch.R;
 import com.rydeenworks.mybooksearch.domain.BookRepositoryEventListner;
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository;
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog;
-import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageListView;
-import com.rydeenworks.mybooksearch.ui.historypage.HistoryPageWebView;
+import com.rydeenworks.mybooksearch.ui.historypage.listview.HistoryPageListView;
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage;
-import com.rydeenworks.mybooksearch.usecase.book.SearchBookInLibrary;
+import com.rydeenworks.mybooksearch.usecase.booksearch.SearchBookInLibrary;
 
 public class MainActivity extends AppCompatActivity
         implements BookRepositoryEventListner
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity
                 historyLastIndexKeyStr,
                 sharedPref,
                 this);
-        reviewDialog = new ReviewDialog(this);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
+        reviewDialog = new ReviewDialog(this, sharedPref);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
 
 //        historyPage = new HistoryPageWebView(bookRepository, this);
         historyPage = new HistoryPageListView(bookRepository, this);

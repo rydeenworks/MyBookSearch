@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch.usecase.webpage
+package com.rydeenworks.mybooksearch.ui.historypage.webview.webpage
 
 import com.rydeenworks.mybooksearch.domain.Book
 

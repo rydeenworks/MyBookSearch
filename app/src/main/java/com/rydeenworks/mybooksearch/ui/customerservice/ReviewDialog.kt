@@ -5,33 +5,24 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import com.rydeenworks.mybooksearch.R
-import com.rydeenworks.mybooksearch.usecase.customerservice.CustomerStatusService
+import com.rydeenworks.mybooksearch.usecase.customerservice.AppReviewFlag
 
 class ReviewDialog (
-    private val activity: Activity
+    private val activity: Activity,
+    sharedPref: SharedPreferences
         ){
 
-    private val customerStatusService: CustomerStatusService
-
-    init {
-        val sharedPref = activity.getSharedPreferences(
-            activity.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE
-        )
-        customerStatusService = CustomerStatusService(
-            sharedPref,
-            activity.getString(R.string.app_is_reviewd)
-        )
-
-    }
+    private val appReviewFlag: AppReviewFlag = AppReviewFlag(sharedPref, activity)
 
     fun showDialog() {
         AlertDialog.Builder(activity)
             .setTitle("レビューにご協力お願いします")
             .setMessage("いつもご利用ありがとうございます。よろしければ励ましのレビューをお寄せください")
             .setPositiveButton("レビューする") { dialog: DialogInterface?, which: Int ->
-                customerStatusService.saveAppReviewFlag()
+                appReviewFlag.saveAppReviewFlag()
                 val uri =
                     Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch")
                 val i = Intent(Intent.ACTION_VIEW, uri)
@@ -49,7 +40,7 @@ class ReviewDialog (
 
     fun showDialog(bookNum: Int)
     {
-        if( customerStatusService.isAppReviewed())
+        if( appReviewFlag.isAppReviewed())
         {
             return
         }

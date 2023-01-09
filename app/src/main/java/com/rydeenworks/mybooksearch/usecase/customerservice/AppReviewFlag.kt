@@ -1,11 +1,14 @@
 package com.rydeenworks.mybooksearch.usecase.customerservice
 
+import android.content.Context
 import android.content.SharedPreferences
+import com.rydeenworks.mybooksearch.R
 
-class CustomerStatusService(
+class AppReviewFlag(
     private val sharedPref: SharedPreferences,
-    private val appReviewFlagKesStr: String,
+    context: Context,
 ) {
+    private val appReviewFlagKesStr: String = context.getString(R.string.app_is_reviewd)
     fun saveAppReviewFlag() {
         val editor = sharedPref.edit()
         editor.putBoolean(appReviewFlagKesStr, true)

@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch.usecase.html
+package com.rydeenworks.mybooksearch.infrastructure.html.amazon
 
 import com.rydeenworks.mybooksearch.domain.Book
 import java.util.regex.Pattern

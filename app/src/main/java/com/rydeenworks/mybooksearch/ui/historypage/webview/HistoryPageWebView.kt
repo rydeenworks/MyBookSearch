@@ -1,13 +1,12 @@
-package com.rydeenworks.mybooksearch.ui.historypage
+package com.rydeenworks.mybooksearch.ui.historypage.webview
 
 import android.app.Activity
 import android.net.Uri
 import android.webkit.WebView
 import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
-import com.rydeenworks.mybooksearch.ui.webview.BookClickEventListener
-import com.rydeenworks.mybooksearch.ui.webview.WebViewAdapter
-import com.rydeenworks.mybooksearch.usecase.browser.OpenChromeBrowser
+import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage
+import com.rydeenworks.mybooksearch.infrastructure.browser.OpenChromeBrowser
 
 class HistoryPageWebView(
     private val bookRepository: BookRepository,

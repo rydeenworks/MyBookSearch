@@ -1,4 +1,4 @@
-package com.rydeenworks.mybooksearch.ui.webview;
+package com.rydeenworks.mybooksearch.ui.historypage.webview;
 
 import android.webkit.WebViewClient;
 

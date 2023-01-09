@@ -1,10 +1,10 @@
-package com.rydeenworks.mybooksearch.ui.webview
+package com.rydeenworks.mybooksearch.ui.historypage.webview
 
 import android.util.Base64
 import android.webkit.WebView
 import com.rydeenworks.mybooksearch.domain.Book
-import com.rydeenworks.mybooksearch.usecase.webpage.CreateBookImageWebPage
-import com.rydeenworks.mybooksearch.usecase.webpage.CreateBookListWebPage
+import com.rydeenworks.mybooksearch.ui.historypage.webview.webpage.CreateBookImageWebPage
+import com.rydeenworks.mybooksearch.ui.historypage.webview.webpage.CreateBookListWebPage
 
 class WebViewAdapter (
     private val webView: WebView,
