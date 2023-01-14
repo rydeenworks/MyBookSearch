@@ -42,8 +42,8 @@ class HistoryListAdapter(
         val name = view?.findViewById<TextView>(R.id.book_title)
         name?.text = historyItem.title
 
-        val age = view?.findViewById<TextView>(R.id.book_detail)
-        age?.text = historyItem.amazonUrl
+//        val age = view?.findViewById<TextView>(R.id.book_detail)
+//        age?.text = historyItem.amazonUrl
 
         return view!!
     }

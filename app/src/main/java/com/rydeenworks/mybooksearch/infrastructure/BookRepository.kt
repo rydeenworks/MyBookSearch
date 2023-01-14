@@ -1,16 +1,40 @@
 package com.rydeenworks.mybooksearch.infrastructure
 
+import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.domain.Book
 import com.rydeenworks.mybooksearch.domain.BookRepositoryEventListner
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import org.json.JSONArray
+import javax.inject.Singleton
 
-class BookRepository (
-    private val historyLastIndexKeyStr: String,
-    private val sharedPrefBooks: SharedPreferences,
-    private val bookRepositoryEventListner: BookRepositoryEventListner
-){
+@InstallIn(SingletonComponent::class)
+@Module
+class BookRepository {
     private val HISTORY_MAX_NUM = 100
+
+    private lateinit var historyLastIndexKeyStr: String
+    private lateinit var sharedPrefBooks: SharedPreferences
+//    private val bookRepositoryEventListner: BookRepositoryEventListner
+
+    @Provides
+    @Singleton
+    fun provideBookRepository(
+        @ApplicationContext context: Context
+    ): BookRepository {
+        val instance = BookRepository()
+        instance.sharedPrefBooks = context.getSharedPreferences(
+            context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE
+        )
+        instance.historyLastIndexKeyStr = context.getString(R.string.history_last_index_key)
+        return  instance
+    }
 
     fun addBook(bookTitle: String, isbn: String)
     {
@@ -24,7 +48,7 @@ class BookRepository (
         saveHistory(lastIndex, bookTitle, isbn)
         saveLastIndex(lastIndex)
 
-        bookRepositoryEventListner.onUpdateBookRepository()
+//        bookRepositoryEventListner.onUpdateBookRepository()
     }
     fun getBookNum() : Int
     {
@@ -55,6 +79,10 @@ class BookRepository (
         val lastIndex = getLastIndex()
         var currIndex = lastIndex
         do {
+//            val sharedPrefBooks = context.getSharedPreferences(
+//                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE
+//            )
+
             val strJson: String =
                 sharedPrefBooks.getString(Integer.toString(currIndex), "")
                     ?: break
@@ -79,8 +107,7 @@ class BookRepository (
         return books
     }
 
-
-    fun isExistHistoryBookTitle(bookTitle: String): Boolean {
+    private fun isExistHistoryBookTitle(bookTitle: String): Boolean {
         val books = getHistoryList()
         for (book in books) {
             if(book.title == bookTitle)

@@ -47,22 +47,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initView() {
-        Context context = getApplicationContext();
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
-        String historyLastIndexKeyStr = getString(R.string.history_last_index_key);
-        bookRepository = new BookRepository(
-                historyLastIndexKeyStr,
-                sharedPref,
-                this);
-        reviewDialog = new ReviewDialog(this, sharedPref);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
-
-//        historyPage = new HistoryPageWebView(bookRepository, this);
-        historyPage = new HistoryPageListView(bookRepository, this);
-
-        appMenu = new AppMenu(this, historyPage, bookRepository, reviewDialog);
-
-        historyPage.updateView();
+//        Context context = getApplicationContext();
+//        SharedPreferences sharedPref = context.getSharedPreferences(
+//                context.getString(R.string.preference_history_file_key), Context.MODE_PRIVATE);
+//        String historyLastIndexKeyStr = getString(R.string.history_last_index_key);
+//        bookRepository = new BookRepository(
+//                historyLastIndexKeyStr,
+//                sharedPref,
+//                this);
+//        reviewDialog = new ReviewDialog(this, sharedPref);  // ダイアログ表示のためにMainActivity由来のContextを渡す必要がある
+//
+////        historyPage = new HistoryPageWebView(bookRepository, this);
+//        historyPage = new HistoryPageListView(bookRepository, this);
+//
+//        appMenu = new AppMenu(this, historyPage, bookRepository, reviewDialog);
+//
+//        historyPage.updateView();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.rydeenworks.mybooksearch.ui.historypage.listview
 
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.view.View
 import android.widget.AdapterView
@@ -9,26 +10,19 @@ import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage
 import com.rydeenworks.mybooksearch.infrastructure.browser.OpenChromeBrowser
+import com.rydeenworks.mybooksearch.ui.SearchBookActivity
 
 class HistoryPageListView(
     private val bookRepository: BookRepository,
     private val activity: Activity,
+    private val listView: ListView,
 ) : IHistoryPage, AdapterView.OnItemClickListener
 {
     lateinit var historyListAdapter: HistoryListAdapter
     lateinit var historyItems: List<HistoryListItem>
 
-    init {
-        activity.setContentView(R.layout.activity_main)
-        activity.title = "図書さがし"
-        activity.setContentView(R.layout.book_search_history);
-    }
-
     override fun updateView() {
         val books = bookRepository.getHistoryList()
-
-        val listView: ListView = activity.findViewById(R.id.book_list)
-
         historyItems = books.map {
             HistoryListItem(
                 it.title,
@@ -54,5 +48,9 @@ class HistoryPageListView(
         val openChromeBrowser = OpenChromeBrowser(activity)
         val uri = Uri.parse(historyItem.amazonUrl)
         openChromeBrowser.handle(uri)
+
+        // request: amazon/calil/mercali/rakuten/yahoo/
+//        val intent = Intent(activity, SearchBookActivity::class.java)
+//        activity.startActivity(intent)
     }
 }
