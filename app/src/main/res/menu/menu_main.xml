@@ -15,4 +15,7 @@
     <item android:id="@+id/menu_app_review"
         android:title="アプリのレビュー・要望">
     </item>
+    <item android:id="@+id/menu_show_history_page"
+        android:title="アプリ更新履歴">
+    </item>
 </menu>

@@ -9,6 +9,7 @@ import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog
 import com.rydeenworks.mybooksearch.ui.historypage.IHistoryPage
 import com.rydeenworks.mybooksearch.usecase.bookbackup.ExportBookList
 import com.rydeenworks.mybooksearch.usecase.bookbackup.ImportBookList
+import com.rydeenworks.mybooksearch.usecase.customerservice.ShowAppHistoryPage
 import com.rydeenworks.mybooksearch.usecase.customerservice.ShowHelpPage
 
 class AppMenu(
@@ -41,6 +42,9 @@ class AppMenu(
             R.id.menu_app_review -> {
                 val reviewDialog = ReviewDialog(activity)
                 reviewDialog.showDialog()
+            }
+            R.id.menu_show_history_page -> {
+                ShowAppHistoryPage(activity).handle()
             }
         }
         return true
