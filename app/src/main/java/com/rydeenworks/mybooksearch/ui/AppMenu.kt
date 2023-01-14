@@ -13,9 +13,8 @@ import com.rydeenworks.mybooksearch.usecase.customerservice.ShowHelpPage
 
 class AppMenu(
     private val activity: Activity,
-    private val historyPage: IHistoryPage,
+//    private val historyPage: IHistoryPage,
     private val bookRepository: BookRepository,
-    private val reviewDialog: ReviewDialog,
 ) {
     fun inflateMenu(menu: Menu): Boolean
     {
@@ -34,12 +33,15 @@ class AppMenu(
                 val importBookList = ImportBookList(activity, bookRepository)
                 importBookList.handle()
             }
-            R.id.print_books_image -> historyPage.togglePageStyle()
+//            R.id.print_books_image -> {} /*historyPage.togglePageStyle()*/
             R.id.menu_show_help_page -> {
                 val showHelpPage = ShowHelpPage(activity)
                 showHelpPage.handle()
             }
-            R.id.menu_app_review -> reviewDialog.showDialog()
+            R.id.menu_app_review -> {
+                val reviewDialog = ReviewDialog(activity)
+                reviewDialog.showDialog()
+            }
         }
         return true
     }

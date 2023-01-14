@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -25,7 +25,8 @@
         android:layout_marginStart="6dp"
         android:layout_marginLeft="6dp"
         app:layout_constraintStart_toEndOf="@id/book_image"
-        app:layout_constraintTop_toTopOf="@id/book_image" />
+        app:layout_constraintTop_toTopOf="@id/book_image"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 <!--    <TextView-->
 <!--        android:id="@+id/book_detail"-->
@@ -36,4 +37,4 @@
 <!--        app:layout_constraintStart_toStartOf="@id/book_title"-->
 <!--        app:layout_constraintTop_toBottomOf="@id/book_title" />-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

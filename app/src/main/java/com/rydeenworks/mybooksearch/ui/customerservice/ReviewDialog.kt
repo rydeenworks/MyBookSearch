@@ -11,11 +11,10 @@ import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.usecase.customerservice.AppReviewFlag
 
 class ReviewDialog (
-    private val activity: Activity,
-    sharedPref: SharedPreferences
+    private val activity: Activity
         ){
 
-    private val appReviewFlag: AppReviewFlag = AppReviewFlag(sharedPref, activity)
+    private val appReviewFlag: AppReviewFlag = AppReviewFlag(activity)
 
     fun showDialog() {
         AlertDialog.Builder(activity)

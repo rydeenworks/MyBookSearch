@@ -1,6 +1,7 @@
 package com.rydeenworks.mybooksearch.ui.historypage.listview
 
 import android.graphics.BitmapFactory
+import android.view.View
 import android.widget.ImageView
 import com.rydeenworks.mybooksearch.R
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ class SetBookImageView(
 
     fun handle(url: String)
     {
+        imageView.visibility = View.INVISIBLE
         GlobalScope.launch {
             try {
                 val imageUrl = URL(url)
@@ -28,6 +30,7 @@ class SetBookImageView(
                     } else {
                         imageView.setImageBitmap(image)
                     }
+                    imageView.visibility = View.VISIBLE
                 }
             }  catch (e: IOException) {
                 withContext(Dispatchers.Main) {
