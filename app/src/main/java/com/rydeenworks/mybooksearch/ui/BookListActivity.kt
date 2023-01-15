@@ -16,17 +16,25 @@ class BookListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyBookSearchTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
-            }
+            content()
         }
     }
+}
+
+@Composable
+fun content()
+{
+    MyBookSearchTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background
+        ) {
+            Greeting("Android")
+            Greeting("Android2")
+        }
+    }
+
 }
 
 @Composable
@@ -40,7 +48,5 @@ fun Greeting(name: String) {
 )
 @Composable
 fun DefaultPreview() {
-    MyBookSearchTheme {
-        Greeting("Android")
-    }
+    content()
 }
