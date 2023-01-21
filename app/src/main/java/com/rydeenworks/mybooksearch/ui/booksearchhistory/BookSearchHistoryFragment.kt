@@ -1,12 +1,12 @@
 package com.rydeenworks.mybooksearch.ui.booksearchhistory
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.rydeenworks.mybooksearch.R
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.rydeenworks.mybooksearch.databinding.FragmentBookSearchHistoryBinding
 
 class BookSearchHistoryFragment : Fragment() {
 
@@ -15,6 +15,12 @@ class BookSearchHistoryFragment : Fragment() {
     }
 
     private lateinit var viewModel: BookSearchHistoryViewModel
+
+    private var _binding: FragmentBookSearchHistoryBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +32,8 @@ class BookSearchHistoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_book_search_history, container, false)
+        _binding = FragmentBookSearchHistoryBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
 }
