@@ -1,9 +1,9 @@
 package com.rydeenworks.mybooksearch.ui.booksearchhistory
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,31 +13,20 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class BookSearchHistoryFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = BookSearchHistoryFragment()
-    }
+class BookSearchHistoryActivity : ComponentActivity() {
 
     private val viewModel: BookSearchHistoryViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                BuildContent()
-            }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent{
+            BuildContent()
         }
     }
 
