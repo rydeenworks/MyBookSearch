@@ -33,17 +33,17 @@ class BookSearchHistoryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                buildContent()
+                BuildContent()
             }
         }
     }
 
     @Preview(showSystemUi = true)
     @Composable
-    fun buildContent()
+    fun BuildContent()
     {
         BookList()
     }
