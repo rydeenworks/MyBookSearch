@@ -12,7 +12,9 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class BookSearchHistoryFragment : Fragment() {
 
     companion object {
@@ -20,11 +22,6 @@ class BookSearchHistoryFragment : Fragment() {
     }
 
     private val viewModel: BookSearchHistoryViewModel by viewModels()
-
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        // TODO: Use the ViewModel
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,26 +38,15 @@ class BookSearchHistoryFragment : Fragment() {
     @Composable
     fun buildContent()
     {
-        List1()
-//        BookList()
+        BookList()
     }
 
     @Composable
-    fun List1() {
+    fun BookList() {
         LazyColumn {
-            items(viewModel.getFluits()) { fruit ->
-                Text(text = "This is $fruit")
+            items(viewModel.getBookList()) { book ->
+                Text(text = "This is ${book.title}")
             }
         }
     }
-
-//    @Composable
-//    fun BookList() {
-//        LazyColumn {
-//            items(viewModel.getBookList()) { book ->
-//                Text(text = "This is ${book.title}")
-//            }
-//        }
-//    }
-
 }

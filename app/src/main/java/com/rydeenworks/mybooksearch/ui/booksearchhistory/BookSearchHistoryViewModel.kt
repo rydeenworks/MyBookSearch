@@ -8,20 +8,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BookSearchHistoryViewModel @Inject constructor(
-//    private val bookRepository: BookRepository,
+    private val bookRepository: BookRepository,
 ) : ViewModel() {
-    // TODO: Implement the ViewModel
-    @Inject
-    lateinit var bookRepository: BookRepository
-//    fun getBookList() : List<Book>
-//    {
-//        return bookRepository.getHistoryList()
-//    }
 
-
-    fun getFluits() :List<String>
+    fun getBookList() : List<Book>
     {
-        val fruits = listOf("Apple", "Orange", "Grape", "Peach", "Strawberry")
-        return fruits
+        return bookRepository.getHistoryList()
     }
 }
