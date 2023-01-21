@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.rydeenworks.mybooksearch.databinding.FragmentBookSearchHistoryBinding
 
 class BookSearchHistoryFragment : Fragment() {
 
@@ -15,12 +18,6 @@ class BookSearchHistoryFragment : Fragment() {
     }
 
     private lateinit var viewModel: BookSearchHistoryViewModel
-
-    private var _binding: FragmentBookSearchHistoryBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,9 +28,18 @@ class BookSearchHistoryFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentBookSearchHistoryBinding.inflate(inflater, container, false)
-        return binding.root
+    ): View? {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                content()
+            }
+        }
     }
 
+    @Preview(showSystemUi = true)
+    @Composable
+    fun content()
+    {
+        Text(text = "Hello world.")
+    }
 }
