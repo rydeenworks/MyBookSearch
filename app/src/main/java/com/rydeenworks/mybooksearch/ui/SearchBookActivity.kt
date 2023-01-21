@@ -11,6 +11,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.databinding.ActivitySearchBookBinding
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
+import com.rydeenworks.mybooksearch.ui.booksearchhistory.AppMenu
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog
 import com.rydeenworks.mybooksearch.usecase.booksearch.SearchBookInLibrary
 import dagger.hilt.android.AndroidEntryPoint
