@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 
 class BookSearchHistoryFragment : Fragment() {
 
@@ -17,13 +19,12 @@ class BookSearchHistoryFragment : Fragment() {
         fun newInstance() = BookSearchHistoryFragment()
     }
 
-    private lateinit var viewModel: BookSearchHistoryViewModel
+    private val viewModel: BookSearchHistoryViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(BookSearchHistoryViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        // TODO: Use the ViewModel
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,15 +32,35 @@ class BookSearchHistoryFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                content()
+                buildContent()
             }
         }
     }
 
     @Preview(showSystemUi = true)
     @Composable
-    fun content()
+    fun buildContent()
     {
-        Text(text = "Hello world.")
+        List1()
+//        BookList()
     }
+
+    @Composable
+    fun List1() {
+        LazyColumn {
+            items(viewModel.getFluits()) { fruit ->
+                Text(text = "This is $fruit")
+            }
+        }
+    }
+
+//    @Composable
+//    fun BookList() {
+//        LazyColumn {
+//            items(viewModel.getBookList()) { book ->
+//                Text(text = "This is ${book.title}")
+//            }
+//        }
+//    }
+
 }
