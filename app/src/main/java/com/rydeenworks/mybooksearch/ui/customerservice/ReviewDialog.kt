@@ -2,13 +2,10 @@ package com.rydeenworks.mybooksearch.ui.customerservice
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
-import android.content.SharedPreferences
-import android.net.Uri
-import com.rydeenworks.mybooksearch.R
-import com.rydeenworks.mybooksearch.usecase.customerservice.AppReviewFlag
+import com.rydeenworks.mybooksearch.domain.customerservice.AppReviewFlag
+import com.rydeenworks.mybooksearch.usecase.customerservice.ShowCustomerSupportPage
+import com.rydeenworks.mybooksearch.usecase.customerservice.ShowGooglePlayPage
 
 class ReviewDialog (
     private val activity: Activity
@@ -22,16 +19,10 @@ class ReviewDialog (
             .setMessage("いつもご利用ありがとうございます。よろしければ励ましのレビューをお寄せください")
             .setPositiveButton("レビューする") { dialog: DialogInterface?, which: Int ->
                 appReviewFlag.saveAppReviewFlag()
-                val uri =
-                    Uri.parse("https://play.google.com/store/apps/details?id=com.rydeenworks.mybooksearch")
-                val i = Intent(Intent.ACTION_VIEW, uri)
-                activity.startActivity(i)
+                ShowGooglePlayPage().handle(activity)
             }
             .setNeutralButton("その他要望") { dialog: DialogInterface?, which: Int ->
-                val uri =
-                    Uri.parse("https://docs.google.com/forms/d/e/1FAIpQLSegGYDdqtw9gq8xZSb4yqORgFE5A4uQzR0RBrFDtLfsIDfs3g/viewform?usp=sf_link")
-                val i = Intent(Intent.ACTION_VIEW, uri)
-                activity.startActivity(i)
+                ShowCustomerSupportPage().handle(activity)
             }
             .setNegativeButton("また今度") { dialog: DialogInterface?, which: Int -> }
             .show()
