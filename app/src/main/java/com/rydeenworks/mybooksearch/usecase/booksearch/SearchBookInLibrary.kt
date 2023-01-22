@@ -7,7 +7,6 @@ import android.os.Looper
 import android.widget.Toast
 import com.rydeenworks.mybooksearch.domain.Book
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
-import com.rydeenworks.mybooksearch.ui.SearchBookActivity
 
 class SearchBookInLibrary(
     private val activity: Activity,
@@ -39,11 +38,6 @@ class SearchBookInLibrary(
     }
 
     override fun OnSuccessAnalyzingBookPage(book: Book) {
-//        // request: amazon/calil/mercali/rakuten/yahoo/
-//        val intent = Intent(activity, SearchBookActivity::class.java)
-//        activity.startActivity(intent)
-
-
         val requestBookSearch = RequestBookSearch()
         requestBookSearch.handle(book, activity)
         bookRepository.addBook(book.title, book.isbn)
