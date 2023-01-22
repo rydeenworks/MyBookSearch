@@ -1,5 +1,6 @@
 package com.rydeenworks.mybooksearch.ui.booksearchhistory
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,7 +21,9 @@ import androidx.compose.ui.layout.FixedScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.rydeenworks.mybooksearch.R
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
+import com.rydeenworks.mybooksearch.ui.bookexplorer.BookExplorerActivity
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog
 import com.rydeenworks.mybooksearch.usecase.booksearch.SearchBookInAmazon
 import com.rydeenworks.mybooksearch.usecase.booksearch.SearchBookInLibrary
@@ -64,7 +67,11 @@ class BookSearchHistoryActivity : ComponentActivity() {
             items(viewModel.getBookList()) { book ->
                 Row(
                     modifier = Modifier.clickable {
-                        SearchBookInAmazon(this@BookSearchHistoryActivity, bookRepository).handle(book)
+//                        SearchBookInAmazon(this@BookSearchHistoryActivity, bookRepository).handle(book)
+                        val intent = Intent(this@BookSearchHistoryActivity, BookExplorerActivity::class.java).apply {
+                            putExtra(getString(R.string.book_isbn_key), book.isbn)
+                        }
+                        startActivity(intent)
                         }
                 ){
                     AsyncImage(
