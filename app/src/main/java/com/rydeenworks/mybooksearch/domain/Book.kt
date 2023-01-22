@@ -8,4 +8,9 @@ data class Book(
     {
         return title.isNotEmpty() && isbn.isNotEmpty()
     }
+
+    fun getCoverImageUrl() :String
+    {
+        return "https://cover.openbd.jp/" + isbn + ".jpg";
+    }
 }

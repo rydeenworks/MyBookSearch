@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.rydeenworks.mybooksearch.infrastructure.BookRepository
 import com.rydeenworks.mybooksearch.ui.customerservice.ReviewDialog
+import com.rydeenworks.mybooksearch.usecase.booksearch.SearchBookInAmazon
 import com.rydeenworks.mybooksearch.usecase.booksearch.SearchBookInLibrary
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -60,9 +62,13 @@ class BookSearchHistoryActivity : ComponentActivity() {
     fun BookList() {
         LazyColumn {
             items(viewModel.getBookList()) { book ->
-                Row{
+                Row(
+                    modifier = Modifier.clickable {
+                        SearchBookInAmazon(this@BookSearchHistoryActivity, bookRepository).handle(book)
+                        }
+                ){
                     AsyncImage(
-                        model = "https://cover.openbd.jp/" + book.isbn + ".jpg",
+                        model = book.getCoverImageUrl(),
                         contentDescription = null,
                         modifier = Modifier.padding(all = 8.dp),
                         contentScale = FixedScale(0.5f)
