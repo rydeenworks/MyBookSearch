@@ -3,6 +3,19 @@
   <component name="AndroidTestResultsUserPreferences">
     <option name="androidTestResultsTableState">
       <map>
+        <entry key="-837469447">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="nexus_6p_r_11_0_-_api_30-xamarin" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="521783144">
           <value>
             <AndroidTestResultsTableState>
@@ -12,6 +25,7 @@
                   <entry key="HUAWEI&#10; ANE-LX2J" value="120" />
                   <entry key="SCV7N18627000323" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="nexus_6p_r_11_0_-_api_30-xamarin" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

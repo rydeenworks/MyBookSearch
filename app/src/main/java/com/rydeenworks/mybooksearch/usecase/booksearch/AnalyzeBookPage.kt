@@ -1,35 +1,23 @@
 package com.rydeenworks.mybooksearch.usecase.booksearch
 
+import android.util.Log
 import com.rydeenworks.mybooksearch.domain.Book
-import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloadEventListner
 import com.rydeenworks.mybooksearch.infrastructure.html.HtmlDownloader
 import com.rydeenworks.mybooksearch.infrastructure.html.amazon.ParseAmazonHtml
+import java.net.URI
 
-class AnalyzeBookPage(
-    private val analyzeBookPageEventListner: AnalyzeBookPageEventListner
-) : HtmlDownloadEventListner {
-
-    lateinit var book: Book
-
-    fun handle(url: String)
+class AnalyzeBookPage
+{
+    fun handle(url: URI): Book
     {
-        HtmlDownloader(this).execute(url)
-    }
-
-    override fun OnDownloaded(html: String):Boolean {
-        val amazonParser = ParseAmazonHtml()
-        book = amazonParser.handle(html)
-        if (!book.isValid()) {
-            return false
-        }
-        return true
-    }
-
-    override fun OnFailedDownload() {
-        analyzeBookPageEventListner.OnFailedAnalyzingBookPage()
-    }
-
-    override fun OnSuccessDownload() {
-        analyzeBookPageEventListner.OnSuccessAnalyzingBookPage(book)
+        var book: Book
+        var count = 0
+        do {
+            val html = HtmlDownloader().downloadHtml(url)
+            Log.d("AmazonBookPageAnalyzer", html)
+            book = ParseAmazonHtml().handle(html)
+            count++
+        } while (!book.isValid() && count < 10)
+        return book
     }
 }
